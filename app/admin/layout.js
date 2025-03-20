@@ -1,17 +1,15 @@
+
 "use client"
 
 import { useState } from "react"
-import Sidebar from "./Sidebar"
-import TasksSection from "./Task-section"
-import Calendar from "./Calender"
-import TechniciansSection from "./Technician-section"
-import UserProfile from "./User-profile"
+import Sidebar from "@/components/AdminDb/Sidebar"
+import UserProfile from "@/components/AdminDb/User-profile"
 
-export default function Dashboard() {
+export default function RootLayout({ children }) {
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <div className="flex h-screen p-6 bg-gray-50">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar />
       <main className="flex-1 overflow-auto">
         <div className="p-4 md:p-6">
@@ -37,15 +35,7 @@ export default function Dashboard() {
             <UserProfile name="James Adamu" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <TasksSection />
-            </div>
-            <div className="space-y-6">
-              <Calendar />
-              <TechniciansSection />
-            </div>
-          </div>
+          {children}
         </div>
       </main>
     </div>

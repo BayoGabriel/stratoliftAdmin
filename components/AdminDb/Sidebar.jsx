@@ -1,45 +1,53 @@
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import logo from "@/public/logo.png"
+
 export default function Sidebar() {
+  const pathname = usePathname()
+  
   const menuItems = [
-    { icon: "grid", label: "Dashboard", active: true, count: null },
-    { icon: "alert-triangle", label: "SOS", active: false, count: null },
-    { icon: "ticket", label: "Service Tickets", active: false, count: 23 },
-    { icon: "target", label: "Geo-Locator", active: false, count: null },
-    { icon: "users", label: "Technicians", active: false, count: 23 },
-    { icon: "clock", label: "Clock-in System", active: false, count: null },
-    { icon: "tool", label: "Maintenance Schedules", active: false, count: null },
-    { icon: "bar-chart-2", label: "Reports", active: false, count: null },
-    { icon: "box", label: "Inventory", active: false, count: 23 },
-    { icon: "settings", label: "Settings", active: false, count: null },
+    { icon: "grid", label: "Dashboard", url: "/admin", count: null },
+    { icon: "alert-triangle", label: "SOS", url: "/admin/sos", count: null },
+    { icon: "ticket", label: "Service Tickets", url: "/admin/service-ticket", count: 23 },
+    { icon: "target", label: "Geo-Locator", url: "/admin/geo-locator", count: null },
+    { icon: "users", label: "Technicians", url: "/admin/technicians", count: 23 },
+    { icon: "clock", label: "Clock-in System", url: "/admin/clock-in", count: null },
+    { icon: "tool", label: "Maintenance Schedules", url: "/admin/maintenance", count: null },
+    { icon: "bar-chart-2", label: "Reports", url: "/admin/reports", count: null },
+    { icon: "box", label: "Inventory", url: "/admin/inventory", count: 23 },
+    { icon: "settings", label: "Settings", url: "/admin/settings", count: null },
   ]
 
   return (
-    <div className="w-60 bg-white border-r border-gray-200 flex flex-col h-full">
+    <div className="w-60 bg-white border-r p-6 border-gray-200 flex flex-col h-full min-w-[302px]">
       <div className="p-4 border-b border-gray-200">
         <Image src={logo} alt="logo"/>
       </div>
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1">
-          {menuItems.map((item, index) => (
-            <li key={index}>
-              <Link
-                href="#"
-                className={`flex items-center px-4 py-3 text-sm ${
-                  item.active ? "bg-red-500 text-white" : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <span className="inline-flex items-center justify-center w-6 h-6 mr-3">{getIcon(item.icon)}</span>
-                <span>{item.label}</span>
-                {item.count && (
-                  <span className="ml-auto bg-gray-200 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">
-                    {item.count}
-                  </span>
-                )}
-              </Link>
-            </li>
-          ))}
+          {menuItems.map((item, index) => {
+            const isActive = pathname === item.url
+            
+            return (
+              <li key={index}>
+                <Link
+                  href={item.url}
+                  className={`flex items-center px-4 py-3 text-sm ${
+                    isActive ? "bg-[#EC3237] rounded-br-[10px] rounded-tr-[10px] text-white" : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <span className="inline-flex items-center justify-center w-6 h-6 mr-3">{getIcon(item.icon)}</span>
+                  <span>{item.label}</span>
+                  {item.count && (
+                    <span className="ml-auto bg-gray-200 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">
+                      {item.count}
+                    </span>
+                  )}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </nav>
     </div>
@@ -224,4 +232,3 @@ function getIcon(name) {
       return null
   }
 }
-

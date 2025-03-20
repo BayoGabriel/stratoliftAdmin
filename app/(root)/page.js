@@ -1,10 +1,9 @@
-import Dashboard from '@/components/AdminDb/Dashboard'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      <Dashboard/>
+      Homepage
     </div>
   )
 }
