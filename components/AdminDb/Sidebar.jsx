@@ -40,7 +40,7 @@ export default function Sidebar() {
                   <span className="inline-flex items-center justify-center w-6 h-6 mr-3">{getIcon(item.icon)}</span>
                   <span>{item.label}</span>
                   {item.count && (
-                    <span className="ml-auto bg-gray-200 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">
+                    <span className={`ml-auto text-black text-xs font-medium px-2 py-0.5 rounded ${isActive ? "text-white" : ""}`}>
                       {item.count}
                     </span>
                   )}

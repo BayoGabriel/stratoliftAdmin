@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-white">
       <Sidebar />
       <main className="flex-1 overflow-auto">
         <div className="p-4 md:p-6">

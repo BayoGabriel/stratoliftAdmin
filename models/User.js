@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: { 
     type: String, 
-    enum: ['user', 'admin'], 
+    enum: ['user', 'admin', 'technician'], 
     default: 'user' 
   },
   createdAt: { 
@@ -37,8 +37,12 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  trackedOpportunities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Opportunity" }],
-  appliedOpportunities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Opportunity" }],
+  status: {
+    type: String,
+    enum: ['Active', 'Inactive'],
+    default: 'Active',
+    required: true
+  }
 });
 
 const User = mongoose.models.User || mongoose.model('User', UserSchema);

@@ -35,7 +35,7 @@ export const authOptions = {
             name: user.name,
             email: user.email,
             address: user.address,
-            phone: user.phone,
+            school: user.school,
             isAdmin: user.isAdmin,
           };
         } catch (error) {
@@ -55,14 +55,14 @@ export const authOptions = {
         token.name = user.name;
         token.email = user.email;
         token.address = user.address;
-        token.phone = user.phone;
+        token.school = user.school;
         token.isAdmin = user.isAdmin;
       }
 
       // Handle updates dynamically
       if (trigger === "update" && session) {
         token.address = session.address || token.address;
-        token.phone = session.phone || token.phone;
+        token.school = session.school || token.school;
         token.isAdmin = session.isAdmin ?? token.isAdmin;
       }
 
@@ -74,7 +74,7 @@ export const authOptions = {
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.address = token.address;
-        session.user.phone = token.phone;
+        session.user.school = token.school;
         session.user.isAdmin = token.isAdmin;
       }
       return session;

@@ -166,13 +166,13 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={() => handleModalClick(true)}
-                    className="px-[15px] py-[6px] rounded-[8px] font-[400] text-[14px]"
+                    className="px-[15px] py-[6px] rounded-[8px] font-[400] text-[14px] text-black bg-primary"
                   >
                     Login
                   </button>
                   <button
                     onClick={() => handleModalClick(false)}
-                    className="px-[15px] py-[6px] rounded-[8px] font-[400] text-[14px] text-white bg-primary"
+                    className="px-[15px] py-[6px] rounded-[8px] font-[400] text-[14px] text-black bg-primary"
                   >
                     Sign Up
                   </button>
