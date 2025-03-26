@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 export default function Calendar() {
-  const [currentDate] = useState(new Date(2023, 10, 28)) // November 28, 2023
+  const [currentDate] = useState(new Date()) // Use actual current date
 
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -38,7 +38,10 @@ export default function Calendar() {
         day: i,
         currentMonth: true,
         date: new Date(year, month, i),
-        isToday: i === currentDate.getDate(),
+        isToday:
+          i === currentDate.getDate() &&
+          month === currentDate.getMonth() &&
+          year === currentDate.getFullYear(),
       })
     }
 
@@ -83,38 +86,12 @@ export default function Calendar() {
   ]
   const monthName = monthNames[currentDate.getMonth()]
 
-  // Highlighted dates (for demonstration)
-  const highlightedDates = {
-    5: { color: "bg-teal-400 text-white" },
-    16: { color: "bg-red-400 text-white" },
-    18: { color: "bg-red-400 text-white" },
-    28: { color: "bg-pink-500 text-white" },
-  }
-
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <button className="p-1 text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-          <h2 className="text-lg font-medium text-gray-900 mx-2">Nov 28, Wednesday</h2>
-          <button className="p-1 text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
+        <h2 className="text-lg font-medium text-gray-900">
+          {monthName} {currentDate.getFullYear()}
+        </h2>
       </div>
 
       <div className="grid grid-cols-7 gap-1">
@@ -124,20 +101,19 @@ export default function Calendar() {
           </div>
         ))}
 
-        {weeks.slice(0, 5).map((week, weekIndex) =>
+        {weeks.map((week, weekIndex) =>
           week.map((day, dayIndex) => {
-            const isHighlighted = highlightedDates[day.day] && day.currentMonth
-            const colorClass = isHighlighted
-              ? highlightedDates[day.day].color
-              : day.currentMonth
-                ? "hover:bg-gray-100"
-                : "text-gray-400"
             const isToday = day.isToday
+            const colorClass = isToday
+              ? "bg-blue-900 text-white"
+              : day.currentMonth
+              ? "hover:bg-gray-100"
+              : "text-gray-400"
 
             return (
               <div
                 key={`${weekIndex}-${dayIndex}`}
-                className={`text-center py-1 text-sm rounded-full ${isToday ? "bg-pink-500 text-white" : colorClass}`}
+                className={`text-center py-1 text-sm rounded-full ${colorClass}`}
               >
                 {day.day}
               </div>
@@ -148,4 +124,3 @@ export default function Calendar() {
     </div>
   )
 }
-

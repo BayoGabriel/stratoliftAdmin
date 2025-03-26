@@ -20,24 +20,32 @@ export default function CreateTask() {
     setTaskData({ ...taskData, images: e.target.files });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setUploading(true);
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
 
-    // Upload images to Cloudinary (or your preferred storage)
-    const uploadedImages = [];
-    for (const file of taskData.images) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "your_cloudinary_preset");
-
-      const res = await fetch("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", {
+    try {
+      const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
 
       const data = await res.json();
-      uploadedImages.push({ url: data.secure_url, name: file.name, type: file.type });
+      return data.url; // Secure URL from Cloudinary
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setUploading(true);
+
+    const uploadedImages = [];
+    for (const file of taskData.images) {
+      const url = await uploadToCloudinary(file);
+      if (url) uploadedImages.push({ url, name: file.name, type: file.type });
     }
 
     // Send task data to the backend
@@ -49,7 +57,7 @@ export default function CreateTask() {
 
     const result = await response.json();
     setUploading(false);
-    
+
     if (result.success) {
       alert("Task created successfully!");
     } else {

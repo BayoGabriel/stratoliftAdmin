@@ -90,7 +90,9 @@ export default function TasksSection() {
         </div>
         <div className="space-y-4">
           {serviceTasks.map((task) => (
-            <TaskCard key={task._id} task={task} isEmergency={false} />
+            <Link href={`/admin/service-ticket/${task._id}`} key={task._id}>
+              <TaskCard task={task} isEmergency={false} />
+            </Link>
           ))}
         </div>
       </div>

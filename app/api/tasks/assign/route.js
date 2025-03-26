@@ -1,98 +1,119 @@
-// app/api/tasks/assign/route.js - Admin endpoint to assign tasks to technicians
-import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
-import Task from '@/models/Task';
-import User from '@/models/User';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { NextResponse } from "next/server"
+import dbConnect from "@/lib/mongodb"
+import Task from "@/models/Task"
+import User from "@/models/User"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 export async function POST(request) {
-  const session = await getServerSession(authOptions);
-  
+  const session = await getServerSession(authOptions)
+
   if (!session) {
-    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
   }
-  
-  await dbConnect();
-  
+
+  await dbConnect()
+
   // Get the user from the database
-  const user = await User.findOne({ email: session.user.email });
-  
+  const user = await User.findOne({ email: session.user.email })
+
   if (!user) {
-    return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+    return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
   }
-  
+
   // Only admins can assign tasks
-  if (user.role !== 'admin') {
+  if (user.role !== "admin") {
     return NextResponse.json(
-      { success: false, message: 'Only admins can assign tasks' }, 
-      { status: 403 }
-    );
+      {
+        success: false,
+        message: "Only administrators can assign tasks",
+      },
+      { status: 403 },
+    )
   }
-  
+
   try {
-    const body = await request.json();
-    const { taskId, technicianId, message } = body;
-    
+    const { taskId, technicianId, message } = await request.json()
+
     if (!taskId || !technicianId) {
       return NextResponse.json(
-        { success: false, message: 'Task ID and technician ID are required' }, 
-        { status: 400 }
-      );
+        {
+          success: false,
+          message: "Task ID and technician ID are required",
+        },
+        { status: 400 },
+      )
     }
-    
-    // Find the task by taskId
-    const task = await Task.findOne({ taskId });
-    
+
+    // Find the technician
+    const technician = await User.findById(technicianId)
+
+    if (!technician || technician.role !== "technician") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid technician ID",
+        },
+        { status: 400 },
+      )
+    }
+
+    // Find the task by taskId or _id
+    let task = await Task.findOne({ taskId: taskId })
+
     if (!task) {
-      return NextResponse.json({ success: false, message: 'Task not found' }, { status: 404 });
+      task = await Task.findById(taskId)
     }
-    
-    // Verify task is from admin's school
+
+    if (!task) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Task not found",
+        },
+        { status: 404 },
+      )
+    }
+
+    // Check if admin has permission to assign this task (same school)
     if (task.school !== user.school) {
       return NextResponse.json(
-        { success: false, message: 'Cannot assign tasks from other schools' }, 
-        { status: 403 }
-      );
+        {
+          success: false,
+          message: "You do not have permission to assign this task",
+        },
+        { status: 403 },
+      )
     }
-    
-    // Find the technician
-    const technician = await User.findById(technicianId);
-    
-    if (!technician) {
-      return NextResponse.json({ success: false, message: 'Technician not found' }, { status: 404 });
-    }
-    
-    // Verify technician is from same school and has technician role
-    if (technician.school !== user.school || technician.role !== 'technician') {
-      return NextResponse.json(
-        { success: false, message: 'Invalid technician. Must be from same school and have technician role' }, 
-        { status: 400 }
-      );
-    }
-    
+
     // Update the task
-    task.assignedTo = technicianId;
-    task.status = 'assigned';
-    
-    // Add update message if provided
-    if (message) {
-      task.updates.push({
-        message: `Task assigned to technician${message ? `: ${message}` : ''}`,
-        updatedBy: user._id
-      });
-    }
-    
-    await task.save();
-    
-    // Get the updated task with populated fields
-    const updatedTask = await Task.findOne({ taskId })
-      .populate('createdBy', 'name email')
-      .populate('assignedTo', 'name email')
-      .populate('updates.updatedBy', 'name email role');
-    
-    return NextResponse.json({ success: true, data: updatedTask }, { status: 200 });
+    task.assignedTo = technicianId
+    task.status = "assigned"
+
+    // Add update message
+    task.updates.push({
+      message: message || `Task assigned to ${technician.name}`,
+      updatedBy: user._id,
+    })
+
+    await task.save()
+
+    // Return the updated task with populated fields
+    const updatedTask = await Task.findById(task._id)
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate("updates.updatedBy", "name email role")
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Task assigned successfully",
+        data: updatedTask,
+      },
+      { status: 200 },
+    )
   } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 400 });
+    return NextResponse.json({ success: false, message: error.message }, { status: 400 })
   }
 }
+
