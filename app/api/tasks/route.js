@@ -1,6 +1,6 @@
 // app/api/tasks/route.js - Create new task and get tasks
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import dbConnect from '@/lib/mongodb';
 import Task from '@/models/Task';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth';

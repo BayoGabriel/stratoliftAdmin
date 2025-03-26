@@ -1,3 +1,4 @@
+//api/technicianlist/route.js
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";

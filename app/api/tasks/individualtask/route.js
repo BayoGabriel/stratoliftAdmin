@@ -1,6 +1,6 @@
-// app/api/tasks/[taskId]/route.js - Get, update, or delete a specific task
+// app/api/tasks/individualtask/route.js - Get, update, or delete a specific task
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import dbConnect from '@/lib/mongodb';
 import Task from '@/models/Task';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth';

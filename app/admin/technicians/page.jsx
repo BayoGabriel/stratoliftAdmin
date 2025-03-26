@@ -10,7 +10,7 @@ export default function TechnicianManagement() {
   useEffect(() => {
     async function fetchTechnicians() {
       try {
-        const response = await fetch("/api/users");
+        const response = await fetch("/api/technicianlist");
         if (!response.ok) {
           throw new Error("Failed to fetch technicians");
         }

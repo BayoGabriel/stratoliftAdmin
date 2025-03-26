@@ -27,8 +27,9 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1">
           {menuItems.map((item, index) => {
-            const isActive = pathname === item.url
-            
+            const isActive =
+              item.url === "/admin" ? pathname === "/admin" : pathname.startsWith(item.url); // Exact match for Dashboard
+
             return (
               <li key={index}>
                 <Link
@@ -37,16 +38,22 @@ export default function Sidebar() {
                     isActive ? "bg-[#EC3237] rounded-br-[10px] rounded-tr-[10px] text-white" : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  <span className="inline-flex items-center justify-center w-6 h-6 mr-3">{getIcon(item.icon)}</span>
+                  <span className="inline-flex items-center justify-center w-6 h-6 mr-3">
+                    {getIcon(item.icon)}
+                  </span>
                   <span>{item.label}</span>
                   {item.count && (
-                    <span className={`ml-auto text-black text-xs font-medium px-2 py-0.5 rounded ${isActive ? "text-white" : ""}`}>
+                    <span
+                      className={`ml-auto text-black text-xs font-medium px-2 py-0.5 rounded ${
+                        isActive ? "text-white" : ""
+                      }`}
+                    >
                       {item.count}
                     </span>
                   )}
                 </Link>
               </li>
-            )
+            );
           })}
         </ul>
       </nav>

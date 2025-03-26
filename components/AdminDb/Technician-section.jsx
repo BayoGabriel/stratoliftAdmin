@@ -1,17 +1,19 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function TechniciansSection() {
   const [technicians, setTechnicians] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
-        const response = await fetch("/api/users", { cache: "no-store" });
+        const response = await fetch("/api/technicianlist", { cache: "no-store" });
         if (!response.ok) throw new Error("Failed to fetch users");
-  
+
         const data = await response.json();
         setTechnicians(data);
       } catch (err) {
@@ -20,10 +22,9 @@ export default function TechniciansSection() {
         setLoading(false);
       }
     };
-  
+
     fetchTechnicians();
   }, []);
-  
 
   if (loading) return <p>Loading technicians...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -50,7 +51,10 @@ export default function TechniciansSection() {
                   <div className="text-xs text-gray-500">{tech.status || "Active"}</div>
                 </div>
               </div>
-              <button className="px-3 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600">
+              <button
+                className="px-3 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600"
+                onClick={() => router.push(`/admin/technicians/${tech._id}`)}
+              >
                 View
               </button>
             </div>

@@ -1,6 +1,6 @@
 // app/api/tasks/assign/route.js - Admin endpoint to assign tasks to technicians
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import dbConnect from '@/lib/mongodb';
 import Task from '@/models/Task';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth';
