@@ -1,23 +1,39 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import User from "@/models/User";
+import { NextResponse } from "next/server"
+import dbConnect from "@/lib/mongodb"
+import User from "@/models/User"
+import Task from "@/models/Task"
+import { isValidObjectId } from "mongoose"
 
-export async function GET(req) {
-  await dbConnect();
-
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-
-  if (!id) {
-    return NextResponse.json({ message: "Technician ID is required" }, { status: 400 });
-  }
-
+export async function GET(request) {
   try {
-    const technician = await User.findById(id);
-    if (!technician) return NextResponse.json({ message: "Technician not found" }, { status: 404 });
+    await dbConnect()
 
-    return NextResponse.json(technician, { status: 200 });
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get("id")
+
+    if (!id || !isValidObjectId(id)) {
+      return NextResponse.json({ message: "Invalid technician ID" }, { status: 400 })
+    }
+
+    // Get technician details
+    const technician = await User.findById(id)
+
+    if (!technician || technician.role !== "technician") {
+      return NextResponse.json({ message: "Technician not found" }, { status: 404 })
+    }
+
+    // Get tasks assigned to this technician
+    const assignedTasks = await Task.find({ assignedTo: id })
+      .populate("createdBy", "name email")
+      .sort({ createdAt: -1 })
+
+    // Convert to plain object and add tasks
+    const technicianData = technician.toObject()
+    technicianData.assignedTasks = assignedTasks
+
+    return NextResponse.json(technicianData, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ message: "Error fetching technician", error }, { status: 500 });
+    return NextResponse.json({ message: "Error fetching technician details", error }, { status: 500 })
   }
 }
+
