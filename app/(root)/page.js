@@ -172,7 +172,7 @@ const Homepage = () => {
                     </button>
                     {error && <p className="text-red-500">{error}</p>}
                     <p className="text-[16px] text-black inter font-[400]">
-                      Don't have an account?{" "}
+                      Dont have an account?{" "}
                       <button
                         type="button"
                         onClick={() => setShowLoginForm(false)}
