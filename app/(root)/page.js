@@ -142,7 +142,7 @@ const Homepage = () => {
                           name="email"
                           placeholder="Enter your email address"
                           value={formData.email}
-                          className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
+                          className="w-full p-[10px] placeholder:text-black text-black border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
                       </div>
@@ -152,7 +152,7 @@ const Homepage = () => {
                           type={showPassword ? 'text' : 'password'}
                           name="password"
                           placeholder="Password"
-                          className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
+                          className="w-full p-[10px] placeholder:text-black border border-[#403D39CC] text-black placeholder:text-[12px] rounded-[10px]"
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         />
@@ -167,16 +167,16 @@ const Homepage = () => {
                     </div>
                   </div>
                   <div className="w-full flex flex-col gap-4 items-center justify-center">
-                    <button type="submit" className="bg-[#EC3237] text-white py-[10px] px-[20px] rounded-[10px] w-full">
+                    <button type="submit" className="bg-[#EC3237] cursor-pointer text-white py-[10px] px-[20px] rounded-[10px] w-full">
                     {isLoggingIn ? <span>Signing in...</span> : 'Sign In'}
                     </button>
                     {error && <p className="text-red-500">{error}</p>}
-                    <p className="text-[16px] inter font-[400]">
+                    <p className="text-[16px] text-black inter font-[400]">
                       Don't have an account?{" "}
                       <button
                         type="button"
                         onClick={() => setShowLoginForm(false)}
-                        className="text-[#3777FF] font-[900]"
+                        className="text-[#3777FF] cursor-pointer font-[900]"
                       >
                         Sign Up
                       </button>
@@ -194,7 +194,7 @@ const Homepage = () => {
                             type="text"
                             name="firstName"
                             placeholder="Enter your first name"
-                            className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
+                            className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] text-black placeholder:text-black rounded-[10px]"
                             value={formRegisterData.username}
                             onChange={(e) => setFormRegisterData({ ...formRegisterData, username: e.target.value })}
                           />
@@ -205,7 +205,7 @@ const Homepage = () => {
                             type="text"
                             name="lastname"
                             placeholder="Enter your last name"
-                            className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
+                            className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] text-black placeholder:text-black rounded-[10px]"
                             value={formRegisterData.school}
                             onChange={(e) => setFormRegisterData({ ...formRegisterData, school: e.target.value })}
                           />
@@ -217,7 +217,7 @@ const Homepage = () => {
                           type="email"
                           name="email"
                           placeholder="Enter your email address"
-                          className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
+                          className="w-full p-[10px] placeholder:text-black text-black border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
                           value={formRegisterData.email}
                           onChange={(e) => setFormRegisterData({ ...formRegisterData, email: e.target.value })}
                         />
@@ -229,7 +229,7 @@ const Homepage = () => {
                           type={showPassword ? 'text' : 'password'}
                           name="password"
                           placeholder="Password"
-                          className="w-full p-[10px] border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
+                          className="w-full p-[10px] placeholder:text-black text-black border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
                           value={formRegisterData.password}
                           onChange={(e) => setFormRegisterData({ ...formRegisterData, password: e.target.value })}
                         />
@@ -244,16 +244,16 @@ const Homepage = () => {
                     </div>
                   </div>
                   <div className="w-full flex flex-col gap-4 items-center justify-center">
-                    <button type="submit" className="bg-[#EC3237] text-white py-[10px] px-[20px] rounded-[10px] w-full">
+                    <button type="submit" className="bg-[#EC3237] cursor-pointer text-white py-[10px] px-[20px] rounded-[10px] w-full">
                     {isRegistering ? <span>Creating account...</span> : 'Sign Up'}
                     </button>
                     {error1 && <p className="text-red-500">{error1}</p>}
-                    <p className="text-[16px] inter font-[400]">
+                    <p className="text-[16px] inter text-black font-[400]">
                       Already have an account?{" "}
                       <button
                         type="button"
                         onClick={() => setShowLoginForm(true)}
-                        className="text-[#3777FF] font-[900]"
+                        className="text-[#3777FF] cursor-pointer font-[900]"
                       >
                         Sign in
                       </button>
