@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-white text-black">
       <Sidebar />
       <main className="flex-1 overflow-auto">
         <div className="p-4 md:p-6">
@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <UserProfile name="James Adamu" />
+            <UserProfile name="" />
           </div>
 
           {children}

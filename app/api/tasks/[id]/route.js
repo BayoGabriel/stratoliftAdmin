@@ -6,7 +6,9 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 export async function GET(request, { params }) {
-  const taskId = params.id
+  // Await params before accessing its properties
+  const { id } = await params;
+  const taskId = id;
 
   const session = await getServerSession(authOptions)
 
@@ -25,7 +27,7 @@ export async function GET(request, { params }) {
 
   try {
     // Build query to fetch the task
-    const query = { _id: taskId }
+    let query = { _id: taskId }
 
     // Apply role-based access control
     if (user.role === "user") {
@@ -35,8 +37,8 @@ export async function GET(request, { params }) {
       // Technicians can only see tasks assigned to them
       query.assignedTo = user._id
     } else if (user.role === "admin") {
-      // Admins can see all tasks from their school
-      query.school = user.school
+      // Admins can see all tasks 
+      query = { _id: taskId }; // Keep only the ID filter
     }
 
     // Get the task with populated user info
@@ -63,7 +65,9 @@ export async function GET(request, { params }) {
 
 // Add ability to update a specific task
 export async function PATCH(request, { params }) {
-  const taskId = params.id
+  // Await params before accessing its properties
+  const { id } = await params;
+  const taskId = id;
 
   const session = await getServerSession(authOptions)
 
@@ -84,7 +88,7 @@ export async function PATCH(request, { params }) {
     const body = await request.json()
 
     // Build query to find the task
-    const query = { _id: taskId }
+    let query = { _id: taskId }
 
     // Apply role-based access control for finding the task
     if (user.role === "user") {
@@ -95,7 +99,7 @@ export async function PATCH(request, { params }) {
       query.assignedTo = user._id
     } else if (user.role === "admin") {
       // Admins can update all tasks from their school
-      query.school = user.school
+      query = { _id: taskId }; // Admin can access any task
     }
 
     // Find the task first to check permissions
@@ -141,7 +145,9 @@ export async function PATCH(request, { params }) {
 
 // Add ability to delete a specific task
 export async function DELETE(request, { params }) {
-  const taskId = params.id
+  // Await params before accessing its properties
+  const { id } = await params;
+  const taskId = id;
 
   const session = await getServerSession(authOptions)
 
@@ -160,7 +166,7 @@ export async function DELETE(request, { params }) {
 
   try {
     // Build query to find the task
-    const query = { _id: taskId }
+    let query = { _id: taskId }
 
     // Apply role-based access control
     // Only admins and the original creator can delete tasks
@@ -177,8 +183,8 @@ export async function DELETE(request, { params }) {
         { status: 403 },
       )
     } else if (user.role === "admin") {
-      // Admins can delete all tasks from their school
-      query.school = user.school
+      // Admins can delete any task
+      query = { _id: taskId };
     }
 
     // Delete the task
@@ -205,4 +211,3 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ success: false, message: error.message }, { status: 400 })
   }
 }
-

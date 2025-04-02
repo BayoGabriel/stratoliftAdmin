@@ -69,7 +69,7 @@ export async function GET(request) {
       query.assignedTo = user._id;
     } else if (user.role === 'admin') {
       // Admins can see all tasks from their school
-      query.school = user.school;
+      query = {};
     }
     
     // Additional filters from query params

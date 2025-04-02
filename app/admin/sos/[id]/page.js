@@ -1,20 +1,29 @@
+// app/admin/service-ticket/[id]/page.js
 "use client"
 
 import { useState, useEffect } from "react"
+import { use } from "react"
 import ElevatorTicket from "@/components/AdminDb/ElevatorTicket"
 import { toast } from "sonner"
+import TaskAssignedModal from "@/components/shared/TaskAssignedModal"
 
 export default function TicketPage({ params }) {
+  // Unwrap the params Promise
+  const unwrappedParams = use(params)
+  const ticketId = unwrappedParams.id
+  
   const [ticketData, setTicketData] = useState(null)
   const [technicians, setTechnicians] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedTechnician, setSelectedTechnician] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [assignedTechnician, setAssignedTechnician] = useState(null)
 
   useEffect(() => {
     // Fetch ticket data
     const fetchTicketData = async () => {
       try {
-        const response = await fetch(`/api/tasks/individualtask/${params.id}`)
+        const response = await fetch(`/api/tasks/${ticketId}`)
         const result = await response.json()
 
         if (result.success) {
@@ -49,7 +58,7 @@ export default function TicketPage({ params }) {
 
     fetchTicketData()
     fetchTechnicians()
-  }, [params.id])
+  }, [ticketId])
 
   const handleAssignTask = async (technicianId) => {
     const techToAssign = technicianId || selectedTechnician
@@ -75,7 +84,13 @@ export default function TicketPage({ params }) {
       const result = await response.json()
 
       if (result.success) {
-        toast.success("Task assigned successfully")
+        // Find the assigned technician's details to display in the modal
+        const technicianDetails = technicians.find(tech => tech._id === techToAssign)
+        setAssignedTechnician(technicianDetails)
+        
+        // Show the modal instead of toast
+        setIsModalOpen(true)
+        
         // Update the ticket data with the new assignment
         setTicketData(result.data)
       } else {
@@ -116,8 +131,22 @@ export default function TicketPage({ params }) {
     }
   }
 
+  const closeModal = () => {
+    setIsModalOpen(false)
+  }
+
   if (isLoading) {
-    return <div className="text-center py-10">Loading...</div>
+    return (
+      <div className="max-w-7xl mx-auto p-5">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-300 rounded w-3/4"></div>
+          <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-300 rounded w-full"></div>
+          <div className="h-4 bg-gray-300 rounded w-full"></div>
+          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+        </div>
+      </div>
+    )
   }
 
   if (!ticketData) {
@@ -126,45 +155,18 @@ export default function TicketPage({ params }) {
 
   return (
     <div className="max-w-7xl mx-auto p-5">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Maintenance Ticket #{ticketData.taskId || ticketData._id}
-      </h1>
-
-      <div className="mb-4">
-        <label htmlFor="technician-select" className="block text-sm font-medium text-gray-700">
-          Assign Technician
-        </label>
-        <div className="flex items-center space-x-4">
-          <select
-            id="technician-select"
-            value={selectedTechnician || ""}
-            onChange={(e) => setSelectedTechnician(e.target.value)}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          >
-            <option value="">Select a Technician</option>
-            {technicians.map((tech) => (
-              <option key={tech._id} value={tech._id} disabled={tech.status !== "Active"}>
-                {tech.name} {tech.status !== "Active" ? "(Inactive)" : ""}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={() => handleAssignTask()}
-            disabled={!selectedTechnician}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Assign Task
-          </button>
-        </div>
-      </div>
-
       <ElevatorTicket
         ticket={ticketData}
         technicians={technicians}
         onAssignTechnician={handleAssignTask}
         onMarkCompleted={handleMarkAsCompleted}
       />
+      
+      <TaskAssignedModal 
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        technician={assignedTechnician}
+      />
     </div>
   )
 }
-

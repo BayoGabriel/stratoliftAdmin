@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import engineer from "@/public/engineer.png";
+import Image from "next/image";
 
 export default function TechniciansSection() {
   const [technicians, setTechnicians] = useState([]);
@@ -26,7 +28,27 @@ export default function TechniciansSection() {
     fetchTechnicians();
   }, []);
 
-  if (loading) return <p>Loading technicians...</p>;
+  if (loading)
+    return (
+      <div className="bg-white rounded-lg shadow p-4 animate-pulse">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Technicians</h2>
+        <div className="space-y-3">
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="h-8 w-8 rounded-full bg-gray-300 mr-3"></div>
+                <div>
+                  <div className="h-4 w-24 bg-gray-300 rounded mb-1"></div>
+                  <div className="h-3 w-16 bg-gray-300 rounded"></div>
+                </div>
+              </div>
+              <div className="h-6 w-16 bg-gray-300 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
@@ -40,8 +62,9 @@ export default function TechniciansSection() {
             <div key={tech._id} className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="h-8 w-8 rounded-full bg-gray-200 mr-3">
-                  <img
-                    src={tech.avatar || "/placeholder.svg?height=32&width=32"}
+                  <Image
+                    src={engineer}
+                    //src = {texh.image}
                     alt={tech.name}
                     className="h-8 w-8 rounded-full object-cover"
                   />

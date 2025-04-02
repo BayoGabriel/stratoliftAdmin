@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react"
 import { FaMapMarkerAlt, FaClock } from "react-icons/fa"
 import Link from "next/link"
-
+import engineer from "@/public/engineer.png"
+import Image from "next/image"
 export default function TechnicianManagement() {
   const [technicians, setTechnicians] = useState([])
   const [loading, setLoading] = useState(true)
@@ -27,16 +28,55 @@ export default function TechnicianManagement() {
     fetchTechnicians()
   }, [])
 
-  if (loading) return <div className="text-center p-6">Loading technicians...</div>
+  if (loading)
+    return (
+      <div className="flex flex-col md:flex-row gap-4 min-h-screen">
+        <div className="bg-white rounded-lg shadow-sm p-6 flex-1">
+          <h2 className="text-lg font-bold mb-6">ALL TECHNICIANS</h2>
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between border-b pb-4 animate-pulse">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full" />
+                  <div className="ml-4">
+                    <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-20"></div>
+                  </div>
+                </div>
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6 md:w-96">
+          <h2 className="text-lg font-bold mb-6">TECHNICIANS ON DUTY</h2>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between animate-pulse">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                  <div className="ml-3">
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                  </div>
+                </div>
+                <div className="h-6 bg-gray-200 rounded w-16"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   if (error) return <div className="text-center text-red-500 p-6">{error}</div>
 
   // All technicians with data from backend
   const allTechnicians = technicians.map((tech) => ({
     id: tech._id,
     name: tech.name,
-    location: tech.location || "Unknown Location",
-    status: tech.status || "Inactive",
-    image: tech.image || "/placeholder.svg?height=60&width=60",
+    location: tech.location || "Abuja",
+    status: tech.status || "Active",
+    image: tech.image || engineer,
     lastSeen: tech.lastSeen || null,
     assignedTasksCount: tech.assignedTasksCount || 0,
   }))
@@ -48,7 +88,7 @@ export default function TechnicianManagement() {
       id: tech._id,
       name: tech.name,
       status: tech.status,
-      image: tech.image || "/placeholder.svg?height=60&width=60",
+      image: tech.image || engineer,
       assignedTasksCount: tech.assignedTasksCount || 0,
       action: "Assign",
     }))
@@ -64,19 +104,19 @@ export default function TechnicianManagement() {
               <div className="flex items-center justify-between border-b pb-4 hover:bg-gray-50 p-2 rounded cursor-pointer transition-colors">
                 <div className="flex items-center">
                   <div className="relative">
-                    <img
-                      src={tech.image || "/placeholder.svg"}
+                    <Image
+                      src={tech.image || engineer}
                       alt={tech.name}
                       className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                     />
                     <div
-                      className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ${
+                      className={`absolute top-0 right-1 w-3 h-3 rounded-full ${
                         tech.status === "Active" ? "bg-green-500" : "bg-gray-400"
                       } border-2 border-white`}
                     ></div>
                   </div>
                   <div className="ml-4">
-                    <h3 className="font-medium">{tech.name}</h3>
+                    <h3 className="font-medium capitalize">{tech.name}</h3>
                     <p className="text-gray-500 text-sm flex items-center">
                       <FaMapMarkerAlt className="mr-1 text-gray-400" size={12} />
                       {tech.location}
@@ -116,13 +156,13 @@ export default function TechnicianManagement() {
                 <div className="flex items-center justify-between hover:bg-gray-50 p-2 rounded cursor-pointer transition-colors">
                   <div className="flex items-center">
                     <div className="relative">
-                      <img
-                        src={tech.image || "/placeholder.svg"}
+                      <Image
+                        src={tech.image || engineer}
                         alt={tech.name}
                         className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                       />
                       <div
-                        className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${
+                        className={`absolute top-0 right-1 w-2.5 h-2.5 rounded-full ${
                           tech.status === "Active" ? "bg-green-500" : "bg-gray-400"
                         } border-2 border-white`}
                       ></div>

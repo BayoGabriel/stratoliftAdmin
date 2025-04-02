@@ -75,8 +75,8 @@ export async function POST(request) {
       )
     }
 
-    // Check if admin has permission to assign this task (same school)
-    if (task.school !== user.school) {
+    // Check if user has permission 
+    if (user.role !== "admin") {
       return NextResponse.json(
         {
           success: false,

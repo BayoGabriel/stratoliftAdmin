@@ -1,52 +1,61 @@
-'use client';
+"use client"
 
-import React, { useState, useEffect } from 'react';
-import { MdFilePresent } from "react-icons/md";
-import Image from 'next/image';
-import Link from 'next/link';
+import { useState, useEffect } from "react"
+import { MdFilePresent } from "react-icons/md"
+import Image from "next/image"
+import Link from "next/link"
 
 export default function TasksSection() {
-  const [emergencyTasks, setEmergencyTasks] = useState([]);
-  const [serviceTasks, setServiceTasks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [emergencyTasks, setEmergencyTasks] = useState([])
+  const [serviceTasks, setServiceTasks] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     async function fetchTasks() {
       try {
-        setIsLoading(true);
+        setIsLoading(true)
         // Fetch emergency (SOS) tasks
-        const sosResponse = await fetch('/api/tasks?type=sos');
-        const sosData = await sosResponse.json();
+        const sosResponse = await fetch("/api/tasks?type=sos")
+        const sosData = await sosResponse.json()
 
         // Fetch service tasks
-        const serviceResponse = await fetch('/api/tasks?type=service');
-        const serviceData = await serviceResponse.json();
+        const serviceResponse = await fetch("/api/tasks?type=service")
+        const serviceData = await serviceResponse.json()
 
         if (sosData.success) {
-          setEmergencyTasks(sosData.data);
+          setEmergencyTasks(sosData.data)
+        } else {
+          throw new Error(sosData.message || "Failed to fetch emergency tasks")
         }
 
         if (serviceData.success) {
-          setServiceTasks(serviceData.data);
+          setServiceTasks(serviceData.data)
+        } else {
+          throw new Error(serviceData.message || "Failed to fetch service tasks")
         }
       } catch (err) {
-        setError('Failed to fetch tasks');
-        console.error(err);
+        setError(err instanceof Error ? err.message : "Failed to fetch tasks")
+        console.error(err)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
 
-    fetchTasks();
-  }, []);
+    fetchTasks()
+  }, [])
 
   if (isLoading) {
-    return <div>Loading tasks...</div>;
+    return <TasksSectionSkeleton />
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong className="font-bold">Error: </strong>
+        <span className="block sm:inline">{error}</span>
+      </div>
+    )
   }
 
   return (
@@ -65,12 +74,18 @@ export default function TasksSection() {
             </svg>
           </button>
         </div>
-        <div className="space-y-4">
-          {emergencyTasks.map((task) => (
-            <Link href={`/admin/sos/${task._id}`} key={task._id}>
-              <TaskCard task={task} isEmergency={true} />
-            </Link>
-          ))}
+        <div className="space-y-4 flex flex-col">
+          {emergencyTasks.length > 0 ? (
+            emergencyTasks.map((task) => (
+              <Link href={`/admin/sos/${task._id}`} key={task._id}>
+                <TaskCard task={task} isEmergency={true} />
+              </Link>
+            ))
+          ) : (
+            <div className="text-center py-8 bg-gray-100 rounded-lg">
+              <p className="text-gray-500">No emergency tasks found</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -88,12 +103,18 @@ export default function TasksSection() {
             </svg>
           </button>
         </div>
-        <div className="space-y-4">
-          {serviceTasks.map((task) => (
-            <Link href={`/admin/service-ticket/${task._id}`} key={task._id}>
-              <TaskCard task={task} isEmergency={false} />
-            </Link>
-          ))}
+        <div className="space-y-4 flex flex-col">
+          {serviceTasks.length > 0 ? (
+            serviceTasks.map((task) => (
+              <Link href={`/admin/service-ticket/${task._id}`} key={task._id}>
+                <TaskCard task={task} isEmergency={false} />
+              </Link>
+            ))
+          ) : (
+            <div className="text-center py-8 bg-gray-100 rounded-lg">
+              <p className="text-gray-500">No service tasks found</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -101,8 +122,54 @@ export default function TasksSection() {
 }
 
 function TaskCard({ task, isEmergency }) {
+  // Get status color based on task status
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "New":
+        return "bg-[#EAB3081A] text-[#CA8A04]"
+      case "Assigned":
+        return "bg-[#3B82F61A] text-[#2563EB]"
+      case "In Progress":
+        return "bg-[#A855F71A] text-[#A855F7]"
+      case "Completed":
+        return "bg-[#22C55E1A] text-[#22C55E]"
+      case "Cancelled":
+        return "bg-[#6B72801A] text-[#6B7280]"
+      default:
+        return "bg-[#EAB3081A] text-[#CA8A04]"
+    }
+  }
+
+  // Get priority color based on task priority
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "Critical":
+        return "bg-[#EF44441A] text-[#EF4444]"
+      case "High":
+        return "bg-[#F97316] text-[#F97316]"
+      case "Medium":
+        return "bg-[#3B82F61A] text-[#2563EB]"
+      case "Low":
+        return "bg-[#22C55E1A] text-[#22C55E]"
+      default:
+        return "bg-[#3B82F61A] text-[#2563EB]"
+    }
+  }
+
+  // Format date to relative time (e.g., "2 hours ago")
+  const getRelativeTime = (dateString) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`
+    return `${Math.floor(diffInSeconds / 86400)} days ago`
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center gap-[45px]">
           <h3 className="font-[700] text-[#1F2633] inter text-[18px]">{task.location}</h3>
@@ -124,52 +191,62 @@ function TaskCard({ task, isEmergency }) {
           )}
         </div>
         <div className="bg-[#EC32371A] text-[#EC3237] text-[14px] font-[800] px-2 py-[5px] rounded">
-          Tech: {task.assignedTo?.name || 'Unassigned'}
+          Tech: {task.assignedTo?.name || "Unassigned"}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
-          <div className="text-[#606C80] text-[12px] font-[800] inter border border-[#EBEEF2] py-[5px] px-[8px] rounded-[16px]">
+          <div className="text-[#606C80] text-[12px] font-[800] inter border border-[#EBEEF2] py-[5px] px-[8px] rounded-[16px] inline-block">
             Task ID: {task.taskId}
           </div>
-          <div className="text-[#2563EB] bg-[#3B82F61A] text-[12px] font-[800] inter py-[5px] px-[8px] rounded-[16px]">
+          <div
+            className={`${getPriorityColor(task.priority)} text-[12px] font-[800] inter py-[5px] px-[8px] rounded-[16px] inline-block ml-1`}
+          >
             Priority: {task.priority}
           </div>
-          <div className="bg-[#EAB3081A] text-[#CA8A04] text-[12px] font-[800] inter px-[8px] py-[5px] rounded-[16px]">
+          <div
+            className={`${getStatusColor(task.status)} text-[12px] font-[800] inter px-[8px] py-[5px] rounded-[16px] inline-block`}
+          >
             Status: {task.status}
           </div>
+          <div className="text-xs text-gray-500 mt-1">Created: {getRelativeTime(task.createdAt)}</div>
         </div>
-        <div className="flex justify-between flex-col items-start mt-4">
+        <div className="flex justify-between flex-col items-end">
           <div className="flex -space-x-2">
-            {task.createdBy.image && (
-              <div className="h-7 w-7 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs">
-                <Image 
-                  src={task.createdBy.image} 
-                  alt={`${task.createdBy.name}'s profile`} 
-                  width={28} 
-                  height={28} 
-                  className="h-full w-full rounded-full" 
+            {task.createdBy?.image && (
+              <div className="h-7 w-7 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden">
+                <Image
+                  src={task.createdBy.image || "/placeholder.svg"}
+                  alt={`${task.createdBy.name}'s profile`}
+                  width={28}
+                  height={28}
+                  className="h-full w-full rounded-full object-cover"
                 />
               </div>
             )}
             {task.assignedTo?.image && (
-              <div className="h-7 w-7 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs">
-                <Image 
-                  src={task.assignedTo.image} 
-                  alt={`${task.assignedTo.name}'s profile`} 
-                  width={28} 
-                  height={28} 
-                  className="h-full w-full rounded-full" 
+              <div className="h-7 w-7 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden">
+                <Image
+                  src={task.assignedTo.image || "/placeholder.svg"}
+                  alt={`${task.assignedTo.name}'s profile`}
+                  width={28}
+                  height={28}
+                  className="h-full w-full rounded-full object-cover"
                 />
               </div>
             )}
+            {!task.assignedTo?.image && task.assignedTo?.name && (
+              <div className="h-7 w-7 rounded-full bg-blue-500 text-white border-2 border-white flex items-center justify-center text-xs">
+                {task.assignedTo.name.charAt(0)}
+              </div>
+            )}
           </div>
-    
-          <div className="flex space-x-2">
+
+          <div className="flex space-x-2 mt-2">
             <div className="flex items-center space-x-1 text-[#A855F7] px-2 py-1 rounded">
-              <MdFilePresent />
-              <span>{task.updates.length}</span>
+              <MdFilePresent className="h-4 w-4" />
+              <span className="text-xs">{task.updates.length}</span>
             </div>
             <div className="flex items-center space-x-1 text-[#F59E0B] px-2 py-1 rounded">
               <svg
@@ -186,11 +263,45 @@ function TaskCard({ task, isEmergency }) {
                   d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                 />
               </svg>
-              <span>{task.updates.length}</span>
+              <span className="text-xs">{task.updates.length}</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {task.description && (
+        <div className="mt-2 text-sm text-gray-500 overflow-hidden text-ellipsis line-clamp-2">{task.description}</div>
+      )}
+    </div>
+  )
+}
+
+function TasksSectionSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <div className="h-6 w-40 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-32 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-32 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
         </div>
       </div>
     </div>
   )
 }
+

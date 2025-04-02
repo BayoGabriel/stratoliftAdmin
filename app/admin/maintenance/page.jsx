@@ -34,7 +34,7 @@ export default function SOSTicketManagement() {
         
         if (result.success) {
           // Filter for SOS tasks first
-          const sosTasks = result.data.filter(ticket => ticket.type === 'sos');
+          const sosTasks = result.data.filter(ticket => ticket.type === 'maintenance');
           
           // Then filter by active/completed status
           const filteredByTab = sosTasks.filter(ticket => 
@@ -226,34 +226,34 @@ export default function SOSTicketManagement() {
       {/* Table */}
       <div className="overflow-x-auto mt-4">
         {isLoading ? (
-          <table className="min-w-full bg-[#F2F2F2] border-collapse table-fixed">
-          <thead>
-              <tr className="text-left text-[#565656] text-sm uppercase">
-              <th className="w-12 px-4 py-3 font-[600]">No</th>
-              <th className="w-32 px-4 py-3 font-[600]">Client</th>
-              <th className="w-24 px-4 py-3 font-[600]">Ticket ID</th>
-              <th className="w-24 px-4 py-3 font-[600]">Location</th>
-              <th className="w-24 px-4 py-3 font-[600]">Status</th>
-              <th className="w-24 px-4 py-3 font-[600]">Assigned</th>
-              <th className="w-24 px-4 py-3 font-[600]">Date</th>
-              <th className="w-24 px-4 py-3 font-[600]">Priority</th>
-              </tr>
-          </thead>
-          <tbody>
-              {[...Array(5)].map((_, index) => (
-              <tr key={index} className="animate-pulse border-b-[2px] border-b-[#C4C4C4]">
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
-              </tr>
-              ))}
-          </tbody>
-          </table>
+            <table className="min-w-full bg-[#F2F2F2] border-collapse table-fixed">
+            <thead>
+                <tr className="text-left text-[#565656] text-sm uppercase">
+                <th className="w-12 px-4 py-3 font-[600]">No</th>
+                <th className="w-32 px-4 py-3 font-[600]">Client</th>
+                <th className="w-24 px-4 py-3 font-[600]">Ticket ID</th>
+                <th className="w-24 px-4 py-3 font-[600]">Location</th>
+                <th className="w-24 px-4 py-3 font-[600]">Status</th>
+                <th className="w-24 px-4 py-3 font-[600]">Assigned</th>
+                <th className="w-24 px-4 py-3 font-[600]">Date</th>
+                <th className="w-24 px-4 py-3 font-[600]">Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                {[...Array(5)].map((_, index) => (
+                <tr key={index} className="animate-pulse border-b-[2px] border-b-[#C4C4C4]">
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                    <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                </tr>
+                ))}
+            </tbody>
+            </table>
         ) : (
           <table className="min-w-full bg-[#F2F2F2] border-collapse table-fixed">
             <thead>
@@ -272,7 +272,7 @@ export default function SOSTicketManagement() {
               {filteredTickets.length > 0 ? (
                 filteredTickets.map((ticket, index) => (
                   <Link 
-                    href={`/admin/sos/${ticket._id}`} 
+                    href={`/admin/maintenance/${ticket._id}`} 
                     key={ticket._id}
                     className="contents"
                   >

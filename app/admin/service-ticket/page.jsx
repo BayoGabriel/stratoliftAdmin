@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
 
-export default function TicketManagement() {
+export default function SOSTicketManagement() {
   // Tab state
   const [activeTab, setActiveTab] = useState('active');
   
@@ -33,14 +33,17 @@ export default function TicketManagement() {
         const result = await response.json();
         
         if (result.success) {
-          // Filter tickets based on active tab
-          const filteredByTab = result.data.filter(ticket => 
+          // Filter for SOS tasks first
+          const sosTasks = result.data.filter(ticket => ticket.type === 'service');
+          
+          // Then filter by active/completed status
+          const filteredByTab = sosTasks.filter(ticket => 
             activeTab === 'active'
               ? ['pending', 'assigned', 'in-progress', 'unresolved'].includes(ticket.status)
               : ['completed', 'resolved'].includes(ticket.status)
           );
           
-          setTickets(filteredByTab);
+          setTickets(sosTasks);
           setFilteredTickets(filteredByTab);
         } else {
           toast.error(result.message || 'Failed to fetch tickets');
@@ -63,6 +66,13 @@ export default function TicketManagement() {
     if (!tickets.length) return;
     
     const filtered = tickets.filter(ticket => {
+      // First, filter by active/completed tab
+      const isTabMatch = activeTab === 'active'
+        ? ['pending', 'assigned', 'in-progress', 'unresolved'].includes(ticket.status)
+        : ['completed', 'resolved'].includes(ticket.status);
+      
+      if (!isTabMatch) return false;
+      
       // Apply status filter
       if (statusFilter && ticket.status !== statusFilter) return false;
       
@@ -80,7 +90,7 @@ export default function TicketManagement() {
     });
     
     setFilteredTickets(filtered);
-  }, [tickets, statusFilter, dateFilter, priorityFilter, assignedFilter]);
+  }, [tickets, statusFilter, dateFilter, priorityFilter, assignedFilter, activeTab]);
   
   // Reset filters
   const resetFilters = () => {
@@ -111,7 +121,7 @@ export default function TicketManagement() {
     return ['', ...new Set(dates)];
   };
   
-  // Count active and completed tickets (based on current fetch)
+  // Count active and completed SOS tickets
   const activeCount = tickets.filter(ticket => 
     ['pending', 'assigned', 'in-progress', 'unresolved'].includes(ticket.status)
   ).length;
@@ -216,32 +226,57 @@ export default function TicketManagement() {
       {/* Table */}
       <div className="overflow-x-auto mt-4">
         {isLoading ? (
-          <div className="flex justify-center items-center py-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
+          <table className="min-w-full bg-[#F2F2F2] border-collapse table-fixed">
+          <thead>
+              <tr className="text-left text-[#565656] text-sm uppercase">
+              <th className="w-12 px-4 py-3 font-[600]">No</th>
+              <th className="w-32 px-4 py-3 font-[600]">Client</th>
+              <th className="w-24 px-4 py-3 font-[600]">Ticket ID</th>
+              <th className="w-24 px-4 py-3 font-[600]">Location</th>
+              <th className="w-24 px-4 py-3 font-[600]">Status</th>
+              <th className="w-24 px-4 py-3 font-[600]">Assigned</th>
+              <th className="w-24 px-4 py-3 font-[600]">Date</th>
+              <th className="w-24 px-4 py-3 font-[600]">Priority</th>
+              </tr>
+          </thead>
+          <tbody>
+              {[...Array(5)].map((_, index) => (
+              <tr key={index} className="animate-pulse border-b-[2px] border-b-[#C4C4C4]">
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+                  <td className="px-4 py-4 bg-gray-200 rounded-md"></td>
+              </tr>
+              ))}
+          </tbody>
+          </table>
         ) : (
-          <table className="min-w-full bg-gray-50 border-collapse table-fixed">
+          <table className="min-w-full bg-[#F2F2F2] border-collapse table-fixed">
             <thead>
-              <tr className="text-left text-gray-500 text-sm uppercase">
-                <th className="w-12 px-4 py-3 font-medium">No</th>
-                <th className="w-32 px-4 py-3 font-medium">Client</th>
-                <th className="w-24 px-4 py-3 font-medium">Ticket ID</th>
-                <th className="w-24 px-4 py-3 font-medium">Location</th>
-                <th className="w-24 px-4 py-3 font-medium">Status</th>
-                <th className="w-24 px-4 py-3 font-medium">Assigned</th>
-                <th className="w-24 px-4 py-3 font-medium">Date</th>
-                <th className="w-24 px-4 py-3 font-medium">Priority</th>
+              <tr className="text-left text-[#565656] text-sm uppercase">
+                <th className="w-12 px-4 py-3 font-[600]">No</th>
+                <th className="w-32 px-4 py-3 font-[600]">Client</th>
+                <th className="w-24 px-4 py-3 font-[600]">Ticket ID</th>
+                <th className="w-24 px-4 py-3 font-[600]">Location</th>
+                <th className="w-24 px-4 py-3 font-[600]">Status</th>
+                <th className="w-24 px-4 py-3 font-[600]">Assigned</th>
+                <th className="w-24 px-4 py-3 font-[600]">Date</th>
+                <th className="w-24 px-4 py-3 font-[600]">Priority</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y-[2px] divide-[#C4C4C4]">
               {filteredTickets.length > 0 ? (
                 filteredTickets.map((ticket, index) => (
                   <Link 
                     href={`/admin/service-ticket/${ticket._id}`} 
                     key={ticket._id}
-                    className="contents"  // This allows the link to not interfere with table styling
+                    className="contents"
                   >
-                    <tr className="hover:bg-gray-50 cursor-pointer">
+                    <tr className="hover:bg-gray-50 border-b-[2px] border-b-[#C4C4C4] inter text-[16px] font-[400] cursor-pointer">
                       <td className="px-4 py-4 text-sm text-center">{index + 1}</td>
                       <td className="px-4 py-4 text-sm">
                         {ticket.createdBy?.name || 'Unknown Client'}
@@ -270,7 +305,7 @@ export default function TicketManagement() {
               ) : (
                 <tr>
                   <td colSpan={8} className="px-4 py-4 text-sm text-center text-gray-500">
-                    No tickets found matching the current filters
+                    No SOS tickets found matching the current filters
                   </td>
                 </tr>
               )}
