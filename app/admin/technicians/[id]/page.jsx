@@ -3,6 +3,80 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
 import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from "react-icons/fa"
+import engineer from "@/public/engineer.png"
+import Link from "next/link"
+
+const TechnicianProfileSkeleton = () => {
+  return (
+    <div className="flex flex-col md:flex-row gap-4 p-4 bg-gray-100 min-h-screen animate-pulse">
+      {/* Left Column */}
+      <div className="w-full">
+        {/* Profile Card Skeleton */}
+        <div className="mb-4">
+          <div className="flex items-start gap-3">
+            <div className="relative">
+              <div className="w-[60px] h-[60px] rounded-full bg-gray-300"></div>
+              <span className="w-2 h-2 rounded-full absolute top-1 right-2 bg-gray-400"></span>
+            </div>
+            <div className="flex flex-col gap-[10px]">
+              <div className="h-6 bg-gray-300 rounded w-40"></div>
+              <div className="h-4 bg-gray-300 rounded w-48"></div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 rounded-full mr-1 bg-gray-400"></div>
+                <div className="h-3 bg-gray-300 rounded w-32"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Basic Info Card Skeleton */}
+        <div className="bg-white rounded-lg mt-10 shadow-sm min-w-[635px]">
+          <div className="w-full flex items-center justify-between p-8 border-b-[1px] border-[#DED9DD]">
+            <div className="h-5 bg-gray-300 rounded w-24"></div>
+            <div className="border p-1 rounded-[10px] h-6 bg-gray-300 w-20"></div>
+          </div>
+          <div className="space-y-4 p-8 flex flex-col">
+            {[1, 2, 3, 4].map((item) => (
+              <div key={item} className="flex justify-between">
+                <div className="h-4 bg-gray-300 rounded w-24"></div>
+                <div className="h-4 bg-gray-300 rounded w-40"></div>
+              </div>
+            ))}
+            <div className="flex items-center justify-center mt-6 gap-8 w-full">
+              <div className="h-12 bg-gray-300 rounded-[10px] w-32"></div>
+              <div className="h-12 bg-gray-300 rounded-[10px] w-32"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column */}
+      <div className="w-full">
+        <div className="bg-white rounded-lg p-4 shadow-sm">
+          <div className="h-7 bg-gray-300 rounded w-48 mx-auto my-5"></div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="flex justify-between items-center border-b pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                  <div>
+                    <div className="h-5 bg-gray-300 rounded w-40 mb-1"></div>
+                    <div className="h-3 bg-gray-300 rounded w-24 mb-1"></div>
+                    <div className="h-3 bg-gray-300 rounded w-48"></div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="h-5 bg-gray-300 rounded-full w-20 mb-1"></div>
+                  <div className="h-3 bg-gray-300 rounded w-24"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function TechnicianProfile() {
   const { id } = useParams()
@@ -31,7 +105,7 @@ export default function TechnicianProfile() {
     if (id) fetchTechnician()
   }, [id])
 
-  if (loading) return <p className="p-6">Loading technician details...</p>
+  if (loading) return <TechnicianProfileSkeleton />
   if (error) return <p className="text-red-500 p-6">{error}</p>
 
   // Get status icon based on task status
@@ -62,39 +136,48 @@ export default function TechnicianProfile() {
   return (
     <div className="flex flex-col md:flex-row gap-4 p-4 bg-gray-100 min-h-screen">
       {/* Left Column */}
-      <div className="w-full md:w-1/3">
+      <div className="w-full">
         {/* Profile Card */}
-        <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+        <div className="mb-4">
           <div className="flex items-start gap-3">
+            <div className="relative">
             <Image
-              src={technician.image || "/placeholder.svg?height=60&width=60"}
+              src={technician.image || engineer}
               alt="Profile picture"
               width={60}
               height={60}
-              className="rounded-full border-2 border-blue-500"
+              className="rounded-full border-2 border-green-500"
             />
-            <div className="flex flex-col">
-              <h2 className="font-bold text-lg text-blue-600">{technician.name}</h2>
-              <a href={`mailto:${technician.email}`} className="text-sm text-blue-500">
+            <span className={`w-2 h-2 rounded-full absolute top-1 right-2 ${technician.status === "Active" ? "bg-green-500" : "bg-red-500"}`}></span>
+            </div>
+            <div className="flex flex-col gap-[10px]">
+              <h2 className="font-[600] inter text-lg text-[20px] ">{technician.name}</h2>
+              <Link href={`mailto:${technician.email}`} className="text-[14px] inter">
                 {technician.email}
-              </a>
-              <div className="flex items-center mt-1">
+              </Link>
+              <div className="flex items-center">
                 <div
-                  className={`w-2 h-2 rounded-full mr-1 ${technician.status === "Active" ? "bg-green-500" : "bg-red-500"}`}
+                  className={`w-2 h-2 rounded-full mr-1 ${technician.status === "Active" ? "bg-green-500" : "bg-slate-300"}`}
                 ></div>
-                <span className="text-xs text-gray-500">{technician.status || "Active"}</span>
+                <span className="text-xs text-gray-500">{technician.location || "Abuja, Nigeria"}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Basic Info Card */}
-        <div className="bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="font-medium mb-4">Basic info</h3>
-          <div className="space-y-4">
+        <div className="bg-white rounded-lg mt-10 shadow-sm min-w-[635px]">
+          <div className="w-full flex items-center justify-between p-8 border-b-[1px] border-[#DED9DD]">
+            <h3 className="font-medium mb-4">Basic Data</h3>
+            <div className={`border p-1 rounded-[10px] text-[12px] font-[400] flex items-center gap-1 ${technician.status === "Active" ? "border-[#65A30D] text-[#65A30D] bg-[#F7FEE7]" : "text-slate-600 bg-slate-50 border-slate-600"}`}>
+              <span className={`w-2 h-2 rounded-full mr-1 ${technician.status === "Active" ? "bg-green-500" : "bg-slate-300"}`}></span>
+              {technician.status}
+            </div>
+          </div>
+          <div className="space-y-4 p-8 flex flex-col ">
             <div className="flex justify-between">
               <span className="text-gray-500 text-sm">Technician ID:</span>
-              <span className="text-sm font-medium">{technician._id}</span>
+              <span className="text-sm font-medium">#{technician._id}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500 text-sm">Phone:</span>
@@ -105,21 +188,21 @@ export default function TechnicianProfile() {
               <span className="text-sm font-medium text-right">{technician.address || "N/A"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500 text-sm">Location:</span>
-              <span className="text-sm font-medium">{technician.location || "N/A"}</span>
-            </div>
-            <div className="flex justify-between">
               <span className="text-gray-500 text-sm">Assigned Tasks:</span>
               <span className="text-sm font-medium">{technician.assignedTasks?.length || 0}</span>
+            </div>
+            <div className="flex items-center justify-center mt-6 gap-8 w-full">
+              <button className="bg-white text-black border-2 border-black px-6 py-3 font-[700] inter text-[16px] rounded-[10px]">Terminate</button>
+              <button className="bg-[#EC3237] text-white px-6 py-3 font-[700] inter text-[16px] rounded-[10px]">Suspend</button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Right Column */}
-      <div className="w-full md:w-2/3">
+      <div className="w-full">
         <div className="bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="font-bold text-lg mb-4">ASSIGNED TASKS</h3>
+          <h3 className="text-[20px] inter font-[700] text-center p-5">ASSIGNED TASKS</h3>
           <div className="space-y-3">
             {technician.assignedTasks?.length > 0 ? (
               technician.assignedTasks.map((task) => (
@@ -167,4 +250,3 @@ export default function TechnicianProfile() {
     </div>
   )
 }
-

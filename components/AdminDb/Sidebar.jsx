@@ -21,9 +21,9 @@ export default function Sidebar() {
 
   return (
     <div className="w-60 bg-white border-r p-6 border-gray-200 flex flex-col h-full min-w-[302px]">
-      <div className="p-4 border-b border-gray-200">
+      <Link href="/" className="p-4 border-b border-gray-200">
         <Image src={logo} alt="logo"/>
-      </div>
+      </Link>
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1">
           {menuItems.map((item, index) => {
