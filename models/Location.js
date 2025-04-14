@@ -1,3 +1,4 @@
+//models/Location.js
 import mongoose from "mongoose"
 
 const LocationHistorySchema = new mongoose.Schema({
