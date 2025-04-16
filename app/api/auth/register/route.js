@@ -4,14 +4,22 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(req) {
   try {
-    const { username, email, password, school } = await req.json();
+    const { firstName, lastName, address, email, password, confirmPassword } = await req.json();
 
     // Validate required fields
-    if (!username || !email || !password || !school) {
+    if (!firstName || !lastName || !address || !email || !password) {
       return new Response(
         JSON.stringify({ 
-          message: 'Please provide all required fields: name, email, password, and school' 
+          message: 'Please provide all required fields: firstName, lastName, address, email, and password' 
         }), 
+        { status: 400 }
+      );
+    }
+
+    // Validate password match
+    if (password !== confirmPassword) {
+      return new Response(
+        JSON.stringify({ message: 'Passwords do not match' }), 
         { status: 400 }
       );
     }
@@ -32,13 +40,13 @@ export async function POST(req) {
 
     // Create new user
     const newUser = new User({
-      name: username, // Using username as name
+      firstName,
+      lastName,
+      address,
       email,
       password: hashedPassword,
-      school,
       role: 'user',
-      trackedOpportunities: [],
-      appliedOpportunities: []
+      status: 'Active'
     });
 
     await newUser.save();
@@ -47,9 +55,9 @@ export async function POST(req) {
       JSON.stringify({ 
         message: 'User registered successfully',
         user: {
-          name: newUser.name,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
           email: newUser.email,
-          school: newUser.school,
           role: newUser.role
         }
       }), 

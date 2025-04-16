@@ -1,8 +1,7 @@
-// api/auth/[...nextauth]/route.js
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import dbConnect from "@/lib/mongodb"; // Ensure this is correctly implemented
+import connectMongo from "@/lib/mongodb";
 import User from "@/models/User";
 
 export const authOptions = {
@@ -19,11 +18,15 @@ export const authOptions = {
         }
 
         try {
-          await dbConnect();
+          await connectMongo();
           const user = await User.findOne({ email: credentials.email });
 
           if (!user) {
             throw new Error("No user found with this email.");
+          }
+
+          if (user.status !== 'Active') {
+            throw new Error("Account is inactive. Please contact support.");
           }
 
           const isMatch = await bcrypt.compare(credentials.password, user.password);
@@ -33,15 +36,17 @@ export const authOptions = {
 
           return {
             id: user._id.toString(),
-            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             address: user.address,
-            school: user.school,
-            isAdmin: user.isAdmin,
+            image: user.image,
+            role: user.role,
+            status: user.status,
           };
         } catch (error) {
           console.error("Authentication error:", error);
-          throw new Error("Something went wrong. Please try again.");
+          throw new Error(error.message || "Something went wrong. Please try again.");
         }
       },
     }),
@@ -53,18 +58,22 @@ export const authOptions = {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
         token.email = user.email;
         token.address = user.address;
-        token.school = user.school;
-        token.isAdmin = user.isAdmin;
+        token.image = user.image;
+        token.role = user.role;
+        token.status = user.status;
       }
 
       // Handle updates dynamically
       if (trigger === "update" && session) {
-        token.address = session.address || token.address;
-        token.school = session.school || token.school;
-        token.isAdmin = session.isAdmin ?? token.isAdmin;
+        Object.keys(session).forEach(key => {
+          if (session[key] !== undefined) {
+            token[key] = session[key];
+          }
+        });
       }
 
       return token;
@@ -72,16 +81,19 @@ export const authOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
-        session.user.name = token.name;
+        session.user.firstName = token.firstName;
+        session.user.lastName = token.lastName;
         session.user.email = token.email;
         session.user.address = token.address;
-        session.user.school = token.school;
-        session.user.isAdmin = token.isAdmin;
+        session.user.image = token.image;
+        session.user.role = token.role;
+        session.user.status = token.status;
       }
       return session;
     },
   },
   pages: {
+    signIn: "/", // Redirect to homepage for sign in
     error: "/", // Redirect to homepage on authentication errors
   },
   session: {
