@@ -9,40 +9,60 @@ export async function POST(req) {
     // Validate required fields
     if (!email || !password) {
       return new Response(
-        JSON.stringify({ message: 'Please provide email and password' }), 
-        { status: 400 }
+        JSON.stringify({ message: 'Please provide email and password' }),
+        {
+          status: 400,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+        }
       );
     }
 
     await connectMongo();
 
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return new Response(
-        JSON.stringify({ message: 'User not found' }), 
-        { status: 404 }
+        JSON.stringify({ message: 'User not found' }),
+        {
+          status: 404,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+        }
       );
     }
 
-    // Check if user is active
     if (user.status !== 'Active') {
       return new Response(
-        JSON.stringify({ message: 'Account is inactive. Please contact support.' }), 
-        { status: 403 }
+        JSON.stringify({ message: 'Account is inactive. Please contact support.' }),
+        {
+          status: 403,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+        }
       );
     }
 
-    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return new Response(
-        JSON.stringify({ message: 'Invalid credentials' }), 
-        { status: 400 }
+        JSON.stringify({ message: 'Invalid credentials' }),
+        {
+          status: 400,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+        }
       );
     }
 
-    // Authentication successful
     return new Response(
       JSON.stringify({
         message: 'Login successful',
@@ -53,17 +73,38 @@ export async function POST(req) {
           email: user.email,
           role: user.role,
         },
-      }), 
-      { status: 200 }
+      }),
+      {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+      }
     );
   } catch (error) {
     console.error('Login error:', error);
     return new Response(
-      JSON.stringify({ 
-        message: 'Login failed', 
-        error: error.message 
-      }), 
-      { status: 500 }
+      JSON.stringify({ message: 'Login failed', error: error.message }),
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+      }
     );
   }
+}
+
+// Optional: handle OPTIONS requests (CORS preflight)
+export function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
 }
