@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 import logo from "@/public/stratologo.png"
 import { useState, useEffect } from "react"
