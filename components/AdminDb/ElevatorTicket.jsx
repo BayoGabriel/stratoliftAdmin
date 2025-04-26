@@ -7,7 +7,7 @@ import Image from "next/image"
 import engineer from "@/public/engineer.png"
 
 export default function ElevatorTicket({ ticket, technicians, onAssignTechnician, onMarkCompleted }) {
-  // Format date to relative time (e.g., "2 days ago")
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A"
     try {
@@ -18,7 +18,6 @@ export default function ElevatorTicket({ ticket, technicians, onAssignTechnician
     }
   }
 
-  // Get creator name from the populated field
   const getCreatorName = () => {
     if (ticket.createdBy && ticket.createdBy.name) {
       return ticket.createdBy.name
@@ -26,7 +25,6 @@ export default function ElevatorTicket({ ticket, technicians, onAssignTechnician
     return "Unknown"
   }
 
-  // Get assigned technician name
   const getAssignedTechName = () => {
     if (ticket.assignedTo && ticket.assignedTo.name) {
       return ticket.assignedTo.name
@@ -34,7 +32,6 @@ export default function ElevatorTicket({ ticket, technicians, onAssignTechnician
     return "Not assigned"
   }
 
-  // Format priority with proper capitalization
   const formatPriority = (priority) => {
     if (!priority) return "N/A"
     return priority.charAt(0).toUpperCase() + priority.slice(1)

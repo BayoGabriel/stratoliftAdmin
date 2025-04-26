@@ -47,7 +47,6 @@ const Calendar = () => {
     weeks.push(week)
   }
 
-  // Get month name and year
   const monthNames = [
     "January",
     "February",
