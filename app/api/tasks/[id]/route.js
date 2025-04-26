@@ -98,7 +98,6 @@ export async function PATCH(request, { params }) {
       // Technicians can only update tasks assigned to them
       query.assignedTo = user._id
     } else if (user.role === "admin") {
-      // Admins can update all tasks from their school
       query = { _id: taskId }; // Admin can access any task
     }
 

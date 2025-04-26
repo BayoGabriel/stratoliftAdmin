@@ -13,7 +13,6 @@ export default function ProfilePage() {
     name: "",
     email: "",
     image: "",
-    school: "",
     role: "",
     status: "",
   })
@@ -260,24 +259,6 @@ export default function ProfilePage() {
               />
               {originalUser && changedFields.email && (
                 <div className="original-value">Original: {originalUser.email || "None"}</div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="school" className="form-label">
-                School
-                {changedFields.school && <span className="field-changed">Changed</span>}
-              </label>
-              <input
-                id="school"
-                name="school"
-                className={`form-input ${changedFields.school ? "input-changed" : ""}`}
-                value={user.school || ""}
-                onChange={handleChange}
-                placeholder="Your school"
-              />
-              {originalUser && changedFields.school && (
-                <div className="original-value">Original: {originalUser.school || "None"}</div>
               )}
             </div>
 

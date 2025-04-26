@@ -45,7 +45,6 @@ export async function POST(request) {
     const task = new Task({
       ...body,
       createdBy: user._id,
-      school: user.school,
     });
 
     await task.save();

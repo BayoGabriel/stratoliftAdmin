@@ -52,7 +52,7 @@ export async function PUT(req) {
     // Update only the fields that were sent in the request
     Object.keys(data).forEach((field) => {
       // Only update allowed fields
-      if (["name", "email", "image", "school", "role", "status"].includes(field)) {
+      if (["name", "email", "image", "role", "status"].includes(field)) {
         user[field] = data[field]
       }
     })
@@ -68,7 +68,6 @@ export async function PUT(req) {
         name: user.name,
         email: user.email,
         image: user.image,
-        school: user.school,
         role: user.role,
         status: user.status,
       },
