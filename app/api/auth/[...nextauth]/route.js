@@ -98,8 +98,8 @@ export const authOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 6 * 60 * 60, // 6 hours session expiry
-  },
+    maxAge: 360 * 24 * 60 * 60, // 360 days (12 months) session expiry
+  },  
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 };
