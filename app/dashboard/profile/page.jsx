@@ -91,61 +91,50 @@ export default function ProfilePage() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    // If no fields have changed, show message and return
-    if (Object.keys(changedFields).length === 0) {
-      setMessage({
-        type: "info",
-        text: "No changes to save",
-      })
-      setTimeout(() => setMessage({ type: "", text: "" }), 3000)
-      return
-    }
-
-    setLoading(true)
-
-    // Only send changed fields to the API
-    const updatedData = {}
-    Object.keys(changedFields).forEach((field) => {
-      updatedData[field] = user[field]
-    })
-
+    e.preventDefault();
+    setUploading(true);
+  
     try {
-      const response = await fetch("/api/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
-      })
-
-      if (!response.ok) throw new Error("Failed to update profile")
-
-      const data = await response.json()
-
-      // Update original user data with the new values
-      setOriginalUser({ ...originalUser, ...updatedData })
-      // Clear changed fields
-      setChangedFields({})
-
-      setMessage({
-        type: "success",
-        text: "Profile updated successfully",
-      })
-      setTimeout(() => setMessage({ type: "", text: "" }), 3000)
-
-      router.refresh()
+      const uploadedImages = [];
+      
+      // Convert FileList to Array for proper iteration
+      const fileArray = Array.from(taskData.images || []);
+      
+      for (const file of fileArray) {
+        const url = await uploadToCloudinary(file);
+        if (url) uploadedImages.push({ url, name: file.name, type: file.type });
+      }
+  
+      // Send task data to the backend
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...taskData, attachments: uploadedImages }),
+      });
+  
+      const result = await response.json();
+      
+      if (result.success) {
+        alert("Task created successfully!");
+        // Reset form or redirect
+        setTaskData({
+          title: "",
+          description: "",
+          location: "",
+          type: "service",
+          priority: "medium",
+          images: [],
+        });
+      } else {
+        alert("Error creating task: " + (result.message || "Unknown error"));
+      }
     } catch (error) {
-      setMessage({
-        type: "error",
-        text: "Failed to update profile",
-      })
-      setTimeout(() => setMessage({ type: "", text: "" }), 3000)
+      console.error("Error submitting task:", error);
+      alert("An error occurred while creating the task. Please try again.");
     } finally {
-      setLoading(false)
+      setUploading(false);
     }
-  }
+  };  
 
   const hasChanges = Object.keys(changedFields).length > 0
 
