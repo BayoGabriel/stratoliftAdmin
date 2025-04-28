@@ -67,6 +67,7 @@ export const authOptions = {
         token.status = user.status;
       }
 
+      // Handle updates dynamically
       if (trigger === "update" && session) {
         Object.keys(session).forEach(key => {
           if (session[key] !== undefined) {
@@ -92,40 +93,16 @@ export const authOptions = {
     },
   },
   pages: {
-    signIn: "/",
-    error: "/",
+    signIn: "/", // Redirect to homepage for sign in
+    error: "/", // Redirect to homepage on authentication errors
   },
   session: {
     strategy: "jwt",
-    maxAge: 360 * 24 * 60 * 60, // 360 days
+    maxAge: 360 * 24 * 60 * 60, // 360 days (12 months) session expiry
   },  
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 };
 
-const nextAuthHandler = NextAuth(authOptions);
-
-// New CORS Wrapper
-async function cors(req, res, handler) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204 });
-  }
-
-  return handler(req, res);
-}
-
-// Exports
-const GET = (req, res) => cors(req, res, nextAuthHandler);
-const POST = (req, res) => cors(req, res, nextAuthHandler);
-
-export { GET, POST };
-export async function OPTIONS(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  return new Response(null, { status: 204 });
-}
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
