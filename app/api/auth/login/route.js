@@ -97,7 +97,6 @@ export async function POST(req) {
   }
 }
 
-// Optional: handle OPTIONS requests (CORS preflight)
 export function OPTIONS() {
   return new Response(null, {
     status: 204,
