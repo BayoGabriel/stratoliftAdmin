@@ -1,4 +1,3 @@
-// app/api/auth/[...nextauth]
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
@@ -18,37 +17,32 @@ export const authOptions = {
           throw new Error("Please provide both email and password.");
         }
 
-        try {
-          await connectMongo();
-          const user = await User.findOne({ email: credentials.email });
+        await connectMongo();
+        const user = await User.findOne({ email: credentials.email });
 
-          if (!user) {
-            throw new Error("No user found with this email.");
-          }
-
-          if (user.status !== 'Active') {
-            throw new Error("Account is inactive. Please contact support.");
-          }
-
-          const isMatch = await bcrypt.compare(credentials.password, user.password);
-          if (!isMatch) {
-            throw new Error("Invalid password.");
-          }
-
-          return {
-            id: user._id.toString(),
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            address: user.address,
-            image: user.image,
-            role: user.role,
-            status: user.status,
-          };
-        } catch (error) {
-          console.error("Authentication error:", error);
-          throw new Error(error.message || "Something went wrong. Please try again.");
+        if (!user) {
+          throw new Error("No user found with this email.");
         }
+
+        if (user.status !== 'Active') {
+          throw new Error("Account is inactive. Please contact support.");
+        }
+
+        const isMatch = await bcrypt.compare(credentials.password, user.password);
+        if (!isMatch) {
+          throw new Error("Invalid password.");
+        }
+
+        return {
+          id: user._id.toString(),
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          address: user.address,
+          image: user.image,
+          role: user.role,
+          status: user.status,
+        };
       },
     }),
   ],
@@ -68,7 +62,6 @@ export const authOptions = {
         token.status = user.status;
       }
 
-      // Handle updates dynamically
       if (trigger === "update" && session) {
         Object.keys(session).forEach(key => {
           if (session[key] !== undefined) {
@@ -94,16 +87,38 @@ export const authOptions = {
     },
   },
   pages: {
-    signIn: "/", // Redirect to homepage for sign in
-    error: "/", // Redirect to homepage on authentication errors
+    signIn: "/",
+    error: "/",
   },
   session: {
     strategy: "jwt",
-    maxAge: 360 * 24 * 60 * 60, // 360 days (12 months) session expiry
-  },  
+    maxAge: 360 * 24 * 60 * 60,
+  },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 };
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+const nextAuthHandler = NextAuth(authOptions);
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
+export async function POST(req) {
+  const res = await nextAuthHandler(req);
+  res.headers.set('Access-Control-Allow-Origin', '*');
+  return res;
+}
+
+export async function GET(req) {
+  const res = await nextAuthHandler(req);
+  res.headers.set('Access-Control-Allow-Origin', '*');
+  return res;
+}
