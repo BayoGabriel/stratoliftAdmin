@@ -1,3 +1,4 @@
+//app/api/auth/login/route.js
 import connectMongo from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
