@@ -1,31 +1,32 @@
-// app/api/tasks/route.js - Create new task and get tasks
+// app/api/tasks/route.js
 import dbConnect from '@/lib/mongodb';
 import Task from '@/models/Task';
 import User from '@/models/User';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import jwt from 'jsonwebtoken';
+
+// Helper: Verify JWT from Authorization header
+function verifyToken(authHeader) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('No token provided');
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    return jwt.verify(token, process.env.NEXTAUTH_SECRET);
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
+}
 
 // POST - Create Task
 export async function POST(request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return new Response(
-        JSON.stringify({ success: false, message: 'Unauthorized' }),
-        {
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-    }
+    const authHeader = request.headers.get('authorization');
+    const decoded = verifyToken(authHeader);
 
     await dbConnect();
 
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findById(decoded.id);
 
     if (!user) {
       return new Response(
@@ -63,7 +64,7 @@ export async function POST(request) {
     return new Response(
       JSON.stringify({ success: false, message: error.message }),
       {
-        status: 400,
+        status: 401,
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json',
@@ -76,24 +77,12 @@ export async function POST(request) {
 // GET - Get Tasks
 export async function GET(request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return new Response(
-        JSON.stringify({ success: false, message: 'Unauthorized' }),
-        {
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-    }
+    const authHeader = request.headers.get('authorization');
+    const decoded = verifyToken(authHeader);
 
     await dbConnect();
 
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findById(decoded.id);
 
     if (!user) {
       return new Response(
@@ -164,7 +153,7 @@ export async function GET(request) {
     return new Response(
       JSON.stringify({ success: false, message: error.message }),
       {
-        status: 400,
+        status: 401,
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json',
@@ -181,7 +170,7 @@ export function OPTIONS() {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
 }
