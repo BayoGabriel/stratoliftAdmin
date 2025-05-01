@@ -24,20 +24,6 @@ function verifyToken(authHeader) {
   }
 }
 
-// Helper: Verify JWT from Authorization header
-function verifyToken(authHeader) {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error('No token provided');
-  }
-
-  const token = authHeader.split(' ')[1];
-  try {
-    return jwt.verify(token, process.env.NEXTAUTH_SECRET);
-  } catch (error) {
-    throw new Error('Invalid token');
-  }
-}
-
 export async function GET(request, { params }) {
   try {
     const { id } = params;
