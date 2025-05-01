@@ -1,8 +1,8 @@
-// app/admin/service-ticket/[id]/page.js
 "use client"
 
 import { useState, useEffect } from "react"
 import { use } from "react"
+import { useSession } from "next-auth/react" // Import useSession
 import ElevatorTicket from "@/components/AdminDb/ElevatorTicket"
 import { toast } from "sonner"
 import TaskAssignedModal from "@/components/shared/TaskAssignedModal"
@@ -12,6 +12,7 @@ export default function TicketPage({ params }) {
   const unwrappedParams = use(params)
   const ticketId = unwrappedParams.id
   
+  const { data: session } = useSession() // Get current session with accessToken
   const [ticketData, setTicketData] = useState(null)
   const [technicians, setTechnicians] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -20,10 +21,17 @@ export default function TicketPage({ params }) {
   const [assignedTechnician, setAssignedTechnician] = useState(null)
 
   useEffect(() => {
+    // Only proceed if we have an access token
+    if (!session?.accessToken) return
+
     // Fetch ticket data
     const fetchTicketData = async () => {
       try {
-        const response = await fetch(`/api/tasks/${ticketId}`)
+        const response = await fetch(`/api/tasks/${ticketId}`, {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}` // Include authorization header
+          }
+        })
         const result = await response.json()
 
         if (result.success) {
@@ -40,7 +48,11 @@ export default function TicketPage({ params }) {
     // Fetch technician list
     const fetchTechnicians = async () => {
       try {
-        const response = await fetch("/api/technicianlist")
+        const response = await fetch("/api/technicianlist", {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}` // Include authorization header
+          }
+        })
         const result = await response.json()
 
         if (Array.isArray(result)) {
@@ -58,7 +70,7 @@ export default function TicketPage({ params }) {
 
     fetchTicketData()
     fetchTechnicians()
-  }, [ticketId])
+  }, [ticketId, session])
 
   const handleAssignTask = async (technicianId) => {
     const techToAssign = technicianId || selectedTechnician
@@ -73,6 +85,7 @@ export default function TicketPage({ params }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.accessToken}` // Include authorization header
         },
         body: JSON.stringify({
           taskId: ticketData?.taskId || ticketData?._id,
@@ -108,6 +121,7 @@ export default function TicketPage({ params }) {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.accessToken}` // Include authorization header
         },
         body: JSON.stringify({
           status: "completed",
@@ -135,6 +149,15 @@ export default function TicketPage({ params }) {
     setIsModalOpen(false)
   }
 
+  // Show loading state while waiting for session or data
+  if (!session) {
+    return (
+      <div className="max-w-7xl mx-auto p-5">
+        <div className="text-center py-10">Loading session...</div>
+      </div>
+    )
+  }
+
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto p-5">
@@ -160,6 +183,8 @@ export default function TicketPage({ params }) {
         technicians={technicians}
         onAssignTechnician={handleAssignTask}
         onMarkCompleted={handleMarkAsCompleted}
+        onSelectTechnician={setSelectedTechnician}
+        selectedTechnician={selectedTechnician}
       />
       
       <TaskAssignedModal 

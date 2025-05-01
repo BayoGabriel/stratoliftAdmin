@@ -48,7 +48,7 @@ export default function UserProfile() {
         <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center relative">
           <Image
             src={user.image || profile}
-            alt={user.name}
+            alt="alt"
             width={32}
             height={32}
             className="h-8 w-8 rounded-full object-cover"
