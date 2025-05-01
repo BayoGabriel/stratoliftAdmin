@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import connectMongo from "@/lib/mongodb";
 import User from "@/models/User";
 
@@ -61,6 +62,7 @@ export const authOptions = {
         token.image = user.image;
         token.role = user.role;
         token.status = user.status;
+        token.accessToken = jwt.sign({ id: user.id }, process.env.NEXTAUTH_SECRET, { expiresIn: '1d' });
       }
 
       if (trigger === "update" && session) {
@@ -83,6 +85,7 @@ export const authOptions = {
         session.user.image = token.image;
         session.user.role = token.role;
         session.user.status = token.status;
+        session.accessToken = token.accessToken;
       }
       return session;
     },
@@ -106,7 +109,10 @@ export const authOptions = {
   debug: process.env.NODE_ENV === "development",
 };
 
-const nextAuthHandler = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export const GET = handler;
+export const POST = handler;
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -115,28 +121,6 @@ export async function OPTIONS() {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
-  });
-}
-
-export async function POST(req) {
-  const res = await nextAuthHandler(req);
-  return new Response(res.body, {
-    status: res.status,
-    headers: {
-      ...Object.fromEntries(res.headers),
-      "Access-Control-Allow-Origin": "*",
-    },
-  });
-}
-
-export async function GET(req) {
-  const res = await nextAuthHandler(req);
-  return new Response(res.body, {
-    status: res.status,
-    headers: {
-      ...Object.fromEntries(res.headers),
-      "Access-Control-Allow-Origin": "*",
     },
   });
 }

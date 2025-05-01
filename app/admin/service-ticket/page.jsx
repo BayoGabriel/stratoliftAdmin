@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
+import { useSession } from 'next-auth/react'; // for accessToken
 
 export default function SOSTicketManagement() {
   // Tab state
@@ -25,41 +26,45 @@ export default function SOSTicketManagement() {
     : ['', 'completed', 'resolved'];
   
   // Fetch tickets from API
-  useEffect(() => {
-    const fetchTickets = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`/api/tasks`);
-        const result = await response.json();
-        
-        if (result.success) {
-          // Filter for SOS tasks first
-          const sosTasks = result.data.filter(ticket => ticket.type === 'service');
-          
-          // Then filter by active/completed status
-          const filteredByTab = sosTasks.filter(ticket => 
-            activeTab === 'active'
-              ? ['pending', 'assigned', 'in-progress', 'unresolved'].includes(ticket.status)
-              : ['completed', 'resolved'].includes(ticket.status)
-          );
-          
-          setTickets(sosTasks);
-          setFilteredTickets(filteredByTab);
-        } else {
-          toast.error(result.message || 'Failed to fetch tickets');
+    const { data: session } = useSession(); // get session
+  
+    useEffect(() => {
+      async function fetchTickets() {
+        setIsLoading(true);
+        try {
+          const response = await fetch(`/api/tasks?type=service`, {
+            headers: {
+              Authorization: `Bearer ${session?.accessToken}`,
+            },
+          });
+          const result = await response.json();
+  
+          if (result.success) {
+            // Filter by tab status
+            const filteredByTab = result.data.filter(ticket =>
+              activeTab === 'active'
+                ? ['pending', 'assigned', 'in-progress', 'unresolved'].includes(ticket.status)
+                : ['completed', 'resolved'].includes(ticket.status)
+            );
+  
+            setTickets(result.data);
+            setFilteredTickets(filteredByTab);
+          } else {
+            toast.error(result.message || 'Failed to fetch service tickets');
+          }
+        } catch (error) {
+          console.error('Error fetching tickets:', error);
+          toast.error('Error loading tickets. Please try again.');
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error('Error fetching tickets:', error);
-        toast.error('Error loading tickets. Please try again.');
-      } finally {
-        setIsLoading(false);
       }
-    };
-    
-    fetchTickets();
-    // Reset filters when tab changes
-    resetFilters();
-  }, [activeTab]);
+  
+      if (session?.accessToken) {
+        fetchTickets();
+        resetFilters(); // Reset filters on tab change
+      }
+    }, [session?.accessToken, activeTab]);
   
   // Apply filters when they change
   useEffect(() => {

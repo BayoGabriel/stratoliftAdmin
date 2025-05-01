@@ -4,8 +4,10 @@ import { useState, useEffect } from "react"
 import { MdFilePresent } from "react-icons/md"
 import Image from "next/image"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 export default function TasksSection() {
+  const { data: session } = useSession()
   const [emergencyTasks, setEmergencyTasks] = useState([])
   const [serviceTasks, setServiceTasks] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -16,11 +18,19 @@ export default function TasksSection() {
       try {
         setIsLoading(true)
         // Fetch emergency (SOS) tasks
-        const sosResponse = await fetch("/api/tasks?type=sos")
+        const sosResponse = await fetch("/api/tasks?type=sos", {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        })
         const sosData = await sosResponse.json()
 
         // Fetch service tasks
-        const serviceResponse = await fetch("/api/tasks?type=service")
+        const serviceResponse = await fetch("/api/tasks?type=service", {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        })
         const serviceData = await serviceResponse.json()
 
         if (sosData.success) {
@@ -42,8 +52,10 @@ export default function TasksSection() {
       }
     }
 
-    fetchTasks()
-  }, [])
+    if (session?.accessToken) {
+      fetchTasks()
+    }
+  }, [session?.accessToken])
 
   if (isLoading) {
     return <TasksSectionSkeleton />
