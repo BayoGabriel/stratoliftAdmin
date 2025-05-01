@@ -24,7 +24,7 @@ export const authOptions = {
           throw new Error("No user found with this email.");
         }
 
-        if (user.status !== 'Active') {
+        if (user.status !== "Active") {
           throw new Error("Account is inactive. Please contact support.");
         }
 
@@ -63,7 +63,7 @@ export const authOptions = {
       }
 
       if (trigger === "update" && session) {
-        Object.keys(session).forEach(key => {
+        Object.keys(session).forEach((key) => {
           if (session[key] !== undefined) {
             token[key] = session[key];
           }
@@ -104,21 +104,31 @@ export async function OPTIONS() {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
 }
 
 export async function POST(req) {
   const res = await nextAuthHandler(req);
-  res.headers.set('Access-Control-Allow-Origin', '*');
-  return res;
+  return new Response(res.body, {
+    status: res.status,
+    headers: {
+      ...Object.fromEntries(res.headers),
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
 }
 
 export async function GET(req) {
   const res = await nextAuthHandler(req);
-  res.headers.set('Access-Control-Allow-Origin', '*');
-  return res;
+  return new Response(res.body, {
+    status: res.status,
+    headers: {
+      ...Object.fromEntries(res.headers),
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
 }
