@@ -4,6 +4,13 @@ import Task from '@/models/Task';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
+};
+
 // Helper: Verify JWT from Authorization header
 function verifyToken(authHeader) {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -33,10 +40,7 @@ export async function POST(request) {
         JSON.stringify({ success: false, message: 'User not found' }),
         {
           status: 404,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json',
-          },
+          headers: corsHeaders,
         }
       );
     }
@@ -89,10 +93,7 @@ export async function GET(request) {
         JSON.stringify({ success: false, message: 'User not found' }),
         {
           status: 404,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json',
-          },
+          headers: corsHeaders,
         }
       );
     }
@@ -164,13 +165,9 @@ export async function GET(request) {
 }
 
 // OPTIONS - handle CORS preflight
-export function OPTIONS() {
+export async function OPTIONS() {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+    headers: corsHeaders,
   });
 }

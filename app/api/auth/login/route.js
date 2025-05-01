@@ -2,6 +2,7 @@
 import connectMongo from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 // Handle POST login request
 export async function POST(req) {
@@ -46,9 +47,22 @@ export async function POST(req) {
     // Remove sensitive info
     delete user.password;
 
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        id: user._id.toString(),
+        email: user.email,
+        role: user.role
+      },
+      process.env.NEXTAUTH_SECRET,
+      { expiresIn: '30d' }
+    );
+
     return new Response(
       JSON.stringify({
+        success: true,
         message: 'Login successful',
+        token,
         user, // Send full user object without password
       }),
       {
@@ -83,5 +97,7 @@ export function OPTIONS() {
 // Shared CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
 };

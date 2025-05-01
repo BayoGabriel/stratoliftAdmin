@@ -1,14 +1,17 @@
 // app/api/auth/token/route.js
 import jwt from "jsonwebtoken";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Content-Type": "application/json",
+};
+
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
+    headers: corsHeaders,
   });
 }
 
@@ -21,10 +24,7 @@ export async function POST(request) {
         JSON.stringify({ success: false, message: "Missing required user data" }),
         {
           status: 400,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json",
-          },
+          headers: corsHeaders,
         }
       );
     }
@@ -40,13 +40,18 @@ export async function POST(request) {
     );
 
     return new Response(
-      JSON.stringify({ success: true, token }),
+      JSON.stringify({ 
+        success: true, 
+        token,
+        user: {
+          id: userData.id,
+          email: userData.email,
+          role: userData.role
+        }
+      }),
       {
         status: 200,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
+        headers: corsHeaders,
       }
     );
   } catch (error) {

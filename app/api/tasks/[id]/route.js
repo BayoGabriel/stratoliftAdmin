@@ -1,37 +1,69 @@
-import { NextResponse } from "next/server"
 import dbConnect from "@/lib/mongodb"
 import Task from "@/models/Task"
 import User from "@/models/User"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import jwt from 'jsonwebtoken'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
+};
+
+// Helper: Verify JWT from Authorization header
+function verifyToken(authHeader) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('No token provided');
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    return jwt.verify(token, process.env.NEXTAUTH_SECRET);
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
+}
+
+// Helper: Verify JWT from Authorization header
+function verifyToken(authHeader) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('No token provided');
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    return jwt.verify(token, process.env.NEXTAUTH_SECRET);
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
+}
 
 export async function GET(request, { params }) {
-  // Await params before accessing its properties
-  const { id } = await params;
-  const taskId = id;
-
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
-  }
-
-  await dbConnect()
-
-  // Get the user from the database
-  const user = await User.findOne({ email: session.user.email })
-
-  if (!user) {
-    return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
-  }
-
   try {
+    const { id } = params;
+    const taskId = id;
+
+    const authHeader = request.headers.get('authorization');
+    const decoded = verifyToken(authHeader);
+
+    await dbConnect();
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ success: false, message: "User not found" }),
+        { status: 404, headers: corsHeaders }
+      );
+    }
+
     // Build query to fetch the task
-    let query = { _id: taskId }
+    let query = { _id: taskId };
 
     // Apply role-based access control
     if (user.role === "user") {
       // Users can only see their own tasks
+      query.createdBy = user._id;
       query.createdBy = user._id
     } else if (user.role === "technician") {
       // Technicians can only see tasks assigned to them
@@ -48,44 +80,55 @@ export async function GET(request, { params }) {
       .populate("updates.updatedBy", "name email role")
 
     if (!task) {
-      return NextResponse.json(
-        {
+      return new Response(
+        JSON.stringify({
           success: false,
           message: "Task not found or you do not have permission to view it",
-        },
-        { status: 404 },
+        }),
+        { status: 404, headers: corsHeaders }
       )
     }
 
-    return NextResponse.json({ success: true, data: task }, { status: 200 })
+    return new Response(
+      JSON.stringify({ success: true, data: task }),
+      { status: 200, headers: corsHeaders }
+    )
   } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 400 })
+    return new Response(
+      JSON.stringify({ success: false, message: error.message }),
+      { status: 400, headers: corsHeaders }
+    )
   }
 }
 
 // Add ability to update a specific task
 export async function PATCH(request, { params }) {
-  // Await params before accessing its properties
-  const { id } = await params;
-  const taskId = id;
-
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
-  }
-
-  await dbConnect()
-
-  // Get the user from the database
-  const user = await User.findOne({ email: session.user.email })
-
-  if (!user) {
-    return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
-  }
-
   try {
-    const body = await request.json()
+    const { id } = params;
+    const taskId = id;
+
+    const authHeader = request.headers.get('authorization');
+    const decoded = verifyToken(authHeader);
+
+    if (!decoded) {
+      return new Response(
+        JSON.stringify({ success: false, message: 'Unauthorized' }),
+        { status: 401, headers: corsHeaders }
+      );
+    }
+
+    await dbConnect();
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ success: false, message: 'User not found' }),
+        { status: 404, headers: corsHeaders }
+      );
+    }
+
+    const body = await request.json();
 
     // Build query to find the task
     let query = { _id: taskId }
@@ -105,12 +148,12 @@ export async function PATCH(request, { params }) {
     const existingTask = await Task.findOne(query)
 
     if (!existingTask) {
-      return NextResponse.json(
-        {
+      return new Response(
+        JSON.stringify({
           success: false,
           message: "Task not found or you do not have permission to update it",
-        },
-        { status: 404 },
+        }),
+        { status: 404, headers: corsHeaders }
       )
     }
 
@@ -136,34 +179,45 @@ export async function PATCH(request, { params }) {
       .populate("assignedTo", "name email")
       .populate("updates.updatedBy", "name email role")
 
-    return NextResponse.json({ success: true, data: updatedTask }, { status: 200 })
+    return new Response(
+      JSON.stringify({ success: true, data: updatedTask }),
+      { status: 200, headers: corsHeaders }
+    )
   } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 400 })
+    return new Response(
+      JSON.stringify({ success: false, message: error.message }),
+      { status: 400, headers: corsHeaders }
+    )
   }
 }
 
 // Add ability to delete a specific task
 export async function DELETE(request, { params }) {
-  // Await params before accessing its properties
-  const { id } = await params;
-  const taskId = id;
-
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
-  }
-
-  await dbConnect()
-
-  // Get the user from the database
-  const user = await User.findOne({ email: session.user.email })
-
-  if (!user) {
-    return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
-  }
-
   try {
+    const { id } = params;
+    const taskId = id;
+
+    const authHeader = request.headers.get('authorization');
+    const decoded = verifyToken(authHeader);
+
+    if (!decoded) {
+      return new Response(
+        JSON.stringify({ success: false, message: 'Unauthorized' }),
+        { status: 401, headers: corsHeaders }
+      );
+    }
+
+    await dbConnect();
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ success: false, message: 'User not found' }),
+        { status: 404, headers: corsHeaders }
+      );
+    }
+
     // Build query to find the task
     let query = { _id: taskId }
 
@@ -174,12 +228,12 @@ export async function DELETE(request, { params }) {
       query.createdBy = user._id
     } else if (user.role === "technician") {
       // Technicians cannot delete tasks
-      return NextResponse.json(
-        {
+      return new Response(
+        JSON.stringify({
           success: false,
           message: "Technicians are not authorized to delete tasks",
-        },
-        { status: 403 },
+        }),
+        { status: 403, headers: corsHeaders }
       )
     } else if (user.role === "admin") {
       // Admins can delete any task
@@ -190,23 +244,26 @@ export async function DELETE(request, { params }) {
     const deletedTask = await Task.findOneAndDelete(query)
 
     if (!deletedTask) {
-      return NextResponse.json(
-        {
+      return new Response(
+        JSON.stringify({
           success: false,
           message: "Task not found or you do not have permission to delete it",
-        },
-        { status: 404 },
+        }),
+        { status: 404, headers: corsHeaders }
       )
     }
 
-    return NextResponse.json(
-      {
+    return new Response(
+      JSON.stringify({
         success: true,
         message: "Task deleted successfully",
-      },
-      { status: 200 },
+      }),
+      { status: 200, headers: corsHeaders }
     )
   } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 400 })
+    return new Response(
+      JSON.stringify({ success: false, message: error.message }),
+      { status: 400, headers: corsHeaders }
+    )
   }
 }
