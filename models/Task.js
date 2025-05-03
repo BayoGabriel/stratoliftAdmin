@@ -67,6 +67,9 @@ const TaskSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  phone: {
+    type: Number,
+  },
   completedAt: {
     type: Date
   },
