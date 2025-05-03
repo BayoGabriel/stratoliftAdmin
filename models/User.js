@@ -1,4 +1,8 @@
 import mongoose from "mongoose"
+import { customAlphabet } from 'nanoid';
+
+// Generate 6-character ID with nanoid
+const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
 
 const UserSchema = new mongoose.Schema({
   firstName: {
@@ -46,6 +50,12 @@ const UserSchema = new mongoose.Schema({
     enum: ["Active", "Inactive"],
     default: "Active",
     required: true,
+  },
+  elevator: {
+    type: String,
+    default: () => nanoid(),
+    unique: true,
+    index: true
   },
 })
 
