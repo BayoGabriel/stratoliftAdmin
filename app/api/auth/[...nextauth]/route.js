@@ -26,9 +26,9 @@ export const authOptions = {
           throw new Error("No user found with this email.");
         }
 
-        if (user.status !== "Active") {
-          throw new Error("Account is inactive. Please contact support.");
-        }
+        // if (user.status !== "Active") {
+        //   throw new Error("Account is inactive. Please contact support.");
+        // }
 
         const isMatch = await bcrypt.compare(credentials.password, user.password);
         if (!isMatch) {

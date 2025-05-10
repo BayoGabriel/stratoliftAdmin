@@ -26,15 +26,15 @@ export async function POST(req) {
       });
     }
 
-    if (user.status !== 'Active') {
-      return new Response(
-        JSON.stringify({ message: 'Account is inactive. Please contact support.' }),
-        {
-          status: 403,
-          headers: corsHeaders,
-        }
-      );
-    }
+    // if (user.status !== 'Active') {
+    //   return new Response(
+    //     JSON.stringify({ message: 'Account is inactive. Please contact support.' }),
+    //     {
+    //       status: 403,
+    //       headers: corsHeaders,
+    //     }
+    //   );
+    // }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
