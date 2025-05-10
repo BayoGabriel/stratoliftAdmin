@@ -1,35 +1,36 @@
-//models/Location.js
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const LocationHistorySchema = new mongoose.Schema({
-  userId: {
+const SubmissionSchema = new mongoose.Schema({
+  user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: "User",
+    required: true,
   },
-  coordinates: {
-    type: [Number], // [longitude, latitude]
-    required: true
+  location: {
+    type: String,
+    required: true,
   },
-  address: {
-    type: String
+  submissionType: {
+    type: String,
+    enum: ["resuming", "closing"],
+    required: true,
+  },
+  imageUrl: {
+    type: String,
+    required: true,
   },
   timestamp: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
-  batteryLevel: {
-    type: Number
+  notes: {
+    type: String,
   },
-  accuracy: {
-    type: Number
+  elevatorId: {
+    type: String,
+    required: true,
   }
-})
+});
 
-// Create a geospatial index
-LocationHistorySchema.index({ coordinates: "2dsphere" });
-// Create a time-based index for efficient queries
-LocationHistorySchema.index({ userId: 1, timestamp: -1 });
-
-const LocationHistory = mongoose.models.LocationHistory || mongoose.model("LocationHistory", LocationHistorySchema)
-export default LocationHistory
+const Submission = mongoose.models.Submission || mongoose.model("Submission", SubmissionSchema);
+export default Submission;
