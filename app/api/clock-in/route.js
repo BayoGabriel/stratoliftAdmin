@@ -1,3 +1,4 @@
+//app/api/clock-in/route.js
 import dbConnect from '@/lib/mongodb';
 import ClockIn from '@/models/ClockIn';
 import User from '@/models/User';
