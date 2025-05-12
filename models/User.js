@@ -57,6 +57,9 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     index: true
   },
+  phone: {
+    type: Number,
+  }
 })
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema)
