@@ -151,7 +151,10 @@ export default function TechnicianProfile() {
             <span className={`w-2 h-2 rounded-full absolute top-1 right-2 ${technician.status === "Active" ? "bg-green-500" : "bg-red-500"}`}></span>
             </div>
             <div className="flex flex-col gap-[10px]">
-              <h2 className="font-[600] inter text-lg text-[20px] ">{technician.name}</h2>
+              <div className="font-[600] inter text-lg text-[20px] ">
+                <span>{technician.firstName} </span>
+                <span>{technician.lastName}</span>
+              </div>
               <Link href={`mailto:${technician.email}`} className="text-[14px] inter">
                 {technician.email}
               </Link>

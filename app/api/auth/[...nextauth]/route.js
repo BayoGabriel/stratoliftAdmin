@@ -41,6 +41,7 @@ export const authOptions = {
           lastName: user.lastName,
           email: user.email,
           address: user.address,
+          phone: user.phone,
           image: user.image,
           role: user.role,
           status: user.status,
@@ -60,6 +61,7 @@ export const authOptions = {
         token.lastName = user.lastName;
         token.email = user.email;
         token.address = user.address;
+        token.phone = user.phone;
         token.image = user.image;
         token.role = user.role;
         token.status = user.status;
@@ -83,6 +85,7 @@ export const authOptions = {
         session.user.lastName = token.lastName;
         session.user.email = token.email;
         session.user.address = token.address;
+        session.user.phone = token.phone;
         session.user.image = token.image;
         session.user.role = token.role;
         session.user.status = token.status;

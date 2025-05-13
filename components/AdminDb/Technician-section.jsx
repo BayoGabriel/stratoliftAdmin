@@ -70,7 +70,10 @@ export default function TechniciansSection() {
                   />
                 </div>
                 <div>
-                  <div className="text-sm font-medium">{tech.name}</div>
+                  <div className="text-sm font-medium">
+                    <span>{tech.firstName} </span>
+                    <span>{tech.lastName}</span>
+                  </div>
                   <div className="text-xs text-gray-500">{tech.status || "Active"}</div>
                 </div>
               </div>

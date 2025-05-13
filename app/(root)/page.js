@@ -27,6 +27,7 @@ const Homepage = () => {
     firstName: "",
     lastName: "",
     address: "",
+    phone: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -360,6 +361,20 @@ const Homepage = () => {
                       className="w-full p-[10px] placeholder:text-black text-black border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
                       value={formRegisterData.address}
                       onChange={(e) => setFormRegisterData({ ...formRegisterData, address: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="w-full flex flex-col gap-1">
+                    <label htmlFor="phone" className="h4 text-black">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Enter your phone number"
+                      className="w-full p-[10px] placeholder:text-black text-black border border-[#403D39CC] placeholder:text-[12px] rounded-[10px]"
+                      value={formRegisterData.phone}
+                      onChange={(e) => setFormRegisterData({ ...formRegisterData, phone: e.target.value })}
                       required
                     />
                   </div>

@@ -4,12 +4,12 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(req) {
   try {
-    const { firstName, lastName, address, email, password, confirmPassword } = await req.json();
+    const { firstName, lastName, address, phone, email, password, confirmPassword } = await req.json();
 
-    if (!firstName || !lastName || !address || !email || !password) {
+    if (!firstName || !lastName || !address || !phone || !email || !password) {
       return new Response(
         JSON.stringify({
-          message: 'Please provide all required fields: firstName, lastName, address, email, and password'
+          message: 'Please provide all required fields: firstName, lastName, address, phone, email, and password'
         }),
         {
           status: 400,
@@ -56,6 +56,7 @@ export async function POST(req) {
       firstName,
       lastName,
       address,
+      phone,
       email,
       password: hashedPassword,
       role: 'user',
