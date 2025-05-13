@@ -1,57 +1,49 @@
-//api/upload/route.js
-import { NextResponse } from "next/server"
-import { v2 as cloudinary } from "cloudinary"
+import cloudinary from '@/lib/cloudinary';
+import formidable from 'formidable';
+import fs from 'fs';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+// Disable default body parser in the new Next.js app directory API route config
+export const GET = {
+  body: false, // Disable body parser
+};
 
-export async function POST(req) {
+// Helper function to parse the form and upload file to Cloudinary
+const parseForm = (req) =>
+  new Promise((resolve, reject) => {
+    const form = new formidable.IncomingForm();
+    form.uploadDir = './public/uploads'; // Temporary local upload directory
+
+    form.parse(req, async (err, fields, files) => {
+      if (err) return reject(err);
+
+      const file = files.file.path;
+
+      try {
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(file, {
+          folder: 'nextjs_uploads', // Folder in Cloudinary to store the images
+        });
+
+        // Clean up the uploaded file
+        fs.unlinkSync(file);
+
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+
+// Handle POST requests
+export async function POST(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Only POST requests are allowed' });
+  }
+
   try {
-    const formData = await req.formData()
-    const file = formData.get("file")
-
-    if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 })
-    }
-
-    // Convert file to buffer
-    const buffer = Buffer.from(await file.arrayBuffer())
-
-    // Convert buffer to base64
-    const base64String = `data:${file.type};base64,${buffer.toString("base64")}`
-
-    // Upload to Cloudinary
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload(
-        base64String,
-        {
-          folder: "user_profiles",
-          resource_type: "auto",
-        },
-        (error, result) => {
-          if (error) reject(error)
-          else resolve(result)
-        },
-      )
-    })
-
-    return NextResponse.json({
-      message: "File uploaded successfully",
-      url: result.secure_url,
-    })
+    const image = await parseForm(req);
+    return new Response(JSON.stringify(image), { status: 200 });
   } catch (error) {
-    console.error("Error uploading file:", error)
-    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 })
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
