@@ -73,8 +73,8 @@ export default function TechnicianManagement() {
   // All technicians with data from backend
   const allTechnicians = technicians.map((tech) => ({
     id: tech._id,
-    name: tech.name,
-    location: tech.location || "Abuja",
+    name: tech.firstName,
+    location: tech.address || "Abuja",
     status: tech.status || "Active",
     image: tech.image || engineer,
     lastSeen: tech.lastSeen || null,
@@ -86,7 +86,7 @@ export default function TechnicianManagement() {
     .filter((tech) => tech.isOnDuty)
     .map((tech) => ({
       id: tech._id,
-      name: tech.name,
+      name: tech.firstName,
       status: tech.status,
       image: tech.image || engineer,
       assignedTasksCount: tech.assignedTasksCount || 0,
