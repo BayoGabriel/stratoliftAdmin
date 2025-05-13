@@ -31,7 +31,7 @@ export async function GET() {
           ...techObj,
           isOnDuty,
           assignedTasksCount: assignedTasks.length,
-          status: isOnDuty ? "Active" : "Inactive",
+          status: isOnDuty ? "Active" : "Active",
         }
       }),
     )

@@ -142,7 +142,7 @@ export default function ElevatorTicket({ ticket, technicians, onAssignTechnician
                 {ticket.updates.map((update, index) => (
                   <div key={index} className="bg-gray-50 p-3 rounded text-sm">
                     <div className="flex justify-between mb-1">
-                      <span className="font-medium">{update.updatedBy?.name || "Unknown"}</span>
+                      <span className="font-medium">{update.updatedBy?.firstName || "Unknown"}</span>
                       <span className="text-gray-500 text-xs">{formatDate(update.timestamp || update.updatedAt)}</span>
                     </div>
                     <p>{update.message}</p>
@@ -186,8 +186,11 @@ export default function ElevatorTicket({ ticket, technicians, onAssignTechnician
                     />
                 </div>
                 <div>
-                  <div className="font-[700] text-[16px] inter">{tech.name || "Unknown"}</div>
-                  <div className="text-xs text-gray-500">{tech.status || "Unknown"}</div>
+                  <div className="font-[700] text-[16px] inter">
+                    <span>{tech.firstName} </span>
+                    <span>{tech.lastName} </span>
+                  </div>
+                  <div className="text-xs text-gray-500">{tech.status}</div>
                 </div>
               </div>
               <button

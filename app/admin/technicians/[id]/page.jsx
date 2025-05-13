@@ -218,7 +218,7 @@ export default function TechnicianProfile() {
                       <p className="font-medium">{task.title || "Untitled Task"}</p>
                       <p className="text-xs text-gray-500">Task ID: {task._id}</p>
                       <p className="text-xs text-gray-500">
-                        Created by: {task.createdBy?.name || "Unknown"} on {formatDate(task.createdAt)}
+                        Created by: {task.createdBy?.firstName || "Unknown"} on {formatDate(task.createdAt)}
                       </p>
                     </div>
                   </div>
