@@ -230,7 +230,7 @@ function TaskCard({ task, isEmergency }) {
               <div className="h-7 w-7 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden">
                 <Image
                   src={task.createdBy.image || "/placeholder.svg"}
-                  alt={`${task.createdBy.name}'s profile`}
+                  alt={`${task.createdBy.firstName}'s profile`}
                   width={28}
                   height={28}
                   className="h-full w-full rounded-full object-cover"
@@ -241,7 +241,7 @@ function TaskCard({ task, isEmergency }) {
               <div className="h-7 w-7 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden">
                 <Image
                   src={task.assignedTo.image || "/placeholder.svg"}
-                  alt={`${task.assignedTo.name}'s profile`}
+                  alt={`${task.assignedTo.firstName}'s profile`}
                   width={28}
                   height={28}
                   className="h-full w-full rounded-full object-cover"
@@ -250,7 +250,7 @@ function TaskCard({ task, isEmergency }) {
             )}
             {!task.assignedTo?.image && task.assignedTo?.name && (
               <div className="h-7 w-7 rounded-full bg-blue-500 text-white border-2 border-white flex items-center justify-center text-xs">
-                {task.assignedTo.name.charAt(0)}
+                {task.assignedTo.firstName.charAt(0)}
               </div>
             )}
           </div>

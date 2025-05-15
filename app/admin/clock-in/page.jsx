@@ -148,7 +148,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center">
                       <FaUser className="mr-2 text-gray-500" />
                       <div className="text-sm font-medium text-gray-900">
-                        {clockIn.user?.name || 'Unknown'}
+                        {clockIn.user?.firstName || 'Unknown'}
                       </div>
                     </div>
                   </td>

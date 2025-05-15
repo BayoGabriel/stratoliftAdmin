@@ -19,15 +19,15 @@ export default function ElevatorTicket({ ticket, technicians, onAssignTechnician
   }
 
   const getCreatorName = () => {
-    if (ticket.createdBy && ticket.createdBy.name) {
-      return ticket.createdBy.name
+    if (ticket.createdBy && ticket.createdBy.firstName) {
+      return ticket.createdBy.firstName
     }
     return "Unknown"
   }
 
   const getAssignedTechName = () => {
-    if (ticket.assignedTo && ticket.assignedTo.name) {
-      return ticket.assignedTo.name
+    if (ticket.assignedTo && ticket.assignedTo.firstName) {
+      return ticket.assignedTo.firstName
     }
     return "Not assigned"
   }

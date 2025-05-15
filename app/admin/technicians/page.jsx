@@ -86,7 +86,7 @@ export default function TechnicianManagement() {
     .filter((tech) => tech.isOnDuty)
     .map((tech) => ({
       id: tech._id,
-      name: tech.firstName,
+      name: tech.firstName + " " + tech.lastName,
       status: tech.status,
       image: tech.image || engineer,
       assignedTasksCount: tech.assignedTasksCount || 0,
@@ -95,7 +95,6 @@ export default function TechnicianManagement() {
 
   return (
     <div className="flex flex-col md:flex-row gap-4 min-h-screen">
-      {/* ALL TECHNICIANS PANEL */}
       <div className="bg-white rounded-lg shadow-sm p-6 flex-1">
         <h2 className="text-lg font-bold mb-6">ALL TECHNICIANS</h2>
         <div className="space-y-4">
