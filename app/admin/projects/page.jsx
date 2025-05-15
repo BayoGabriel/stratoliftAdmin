@@ -20,7 +20,7 @@ export default async function ProjectsPage() {
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Projects</h1>
-        <Link href="/projects/create">
+        <Link href="/admin/projects/create">
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
