@@ -16,7 +16,7 @@ export default function Sidebar() {
     { icon: "tool", label: "Maintenance Schedules", url: "/admin/maintenance", count: null },
     { icon: "bar-chart-2", label: "Reports", url: "/admin/reports", count: null },
     { icon: "box", label: "Inventory", url: "/admin/inventory", count: 23 },
-    { icon: "settings", label: "Settings", url: "/admin/settings", count: null },
+    { icon: "projects", label: "Projects", url: "/admin/projects", count: null },
   ]
 
   return (
@@ -217,7 +217,7 @@ function getIcon(name) {
           />
         </svg>
       )
-    case "settings":
+    case "projects":
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
