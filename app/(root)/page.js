@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client"
-import logo from "@/public/stratologo.png"
+import logo from "@/public/logoo.jpg"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
@@ -189,11 +189,11 @@ const Homepage = () => {
 
   return (
     <>
-      <div className="w-full items-center bg-[#F6F6F6] flex px-20 justify-center min-h-screen gap-10">
+      <div className="w-full items-center bg-white flex px-20 justify-center min-h-screen gap-10">
         <div className="flex w-[50%] items-center justify-center h-full">
           <Image src={logo || "/placeholder.svg"} alt="logo" className="" />
         </div>
-        <div className="bg-white w-[50%] rounded-[10px] p-16">
+        <div className="bg-[#F6F6F6]  w-[50%] rounded-[10px] p-16">
           {showForgotPassword ? (
             <form
               onSubmit={handleForgotPassword}
