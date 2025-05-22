@@ -257,7 +257,7 @@ export default function AdminDashboard() {
                       <FaUser className="mr-2 text-blue-500" />
                       <span className="font-medium">Technician:</span>
                     </div>
-                    <p>{selectedClockIn.user?.phone || 'Unknown'}</p>
+                    <p>{selectedClockIn.user?.firstName || 'Unknown'}</p>
                     <p className="text-sm text-gray-500">{selectedClockIn.user?.email}</p>
                   </div>
                   
