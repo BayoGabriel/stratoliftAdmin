@@ -203,7 +203,7 @@ function TaskCard({ task, isEmergency }) {
           )}
         </div>
         <div className="bg-[#EC32371A] text-[#EC3237] text-[14px] font-[800] px-2 py-[5px] rounded">
-          Tech: {task.assignedTo?.name || "Unassigned"}
+          Tech: {task.assignedTo?.fir || "Unassigned"}
         </div>
       </div>
 
