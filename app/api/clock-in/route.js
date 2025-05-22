@@ -191,7 +191,7 @@ export async function GET(request) {
       .sort({ clockInTime: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('user', 'name email role');
+      .populate('user', 'firstName lastName email role');
 
     const total = await ClockIn.countDocuments(query);
 

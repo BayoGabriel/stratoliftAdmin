@@ -92,17 +92,16 @@ export async function POST(request) {
 
     // Add update message
     task.updates.push({
-      message: message || `Task assigned to ${technician.name}`,
+      message: message || `Task assigned to ${technician.firstName}`,
       updatedBy: user._id,
     })
 
     await task.save()
 
-    // Return the updated task with populated fields
     const updatedTask = await Task.findById(task._id)
-      .populate("createdBy", "name email")
-      .populate("assignedTo", "name email")
-      .populate("updates.updatedBy", "name email role")
+      .populate("createdBy", "firstName lastName email")
+      .populate("assignedTo", "firstName lastName email")
+      .populate("updates.updatedBy", "firstName lastName email role")
 
     return NextResponse.json(
       {

@@ -126,9 +126,9 @@ export async function GET(request) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('createdBy', 'name email')
-      .populate('assignedTo', 'name email')
-      .populate('updates.updatedBy', 'name email role');
+      .populate('createdBy', 'firstName lastName email')
+      .populate('assignedTo', 'firstName lastName email')
+      .populate('updates.updatedBy', 'firstName lastName email role');
 
     const total = await Task.countDocuments(query);
 
