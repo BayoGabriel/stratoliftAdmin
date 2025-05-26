@@ -58,7 +58,7 @@ const UserSchema = new mongoose.Schema({
     index: true
   },
   phone: {
-    type: Number,
+    type: String,
   }
 })
 
