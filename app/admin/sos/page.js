@@ -285,7 +285,9 @@ export default function SOSTicketManagement() {
                     <tr className="hover:bg-gray-50 border-b-[2px] border-b-[#C4C4C4] inter text-[16px] font-[400] cursor-pointer">
                       <td className="px-4 py-4 text-sm text-center">{index + 1}</td>
                       <td className="px-4 py-4 text-sm">
-                        {ticket.createdBy?.firstName || 'Unknown Client'}
+                        {ticket.createdBy?.firstName}
+                        {' '}
+                        {ticket.createdBy?.lastName}
                       </td>
                       <td className="px-4 py-4 text-sm">
                         {ticket.taskId || `#${ticket._id.substring(0, 6)}`}
