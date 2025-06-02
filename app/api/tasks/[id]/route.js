@@ -62,9 +62,9 @@ export async function GET(request, { params }) {
 
     // Get the task with populated user info
     const task = await Task.findOne(query)
-      .populate("createdBy", "firstName lastName email")
-      .populate("assignedTo", "firstName lastName email")
-      .populate("updates.updatedBy", "firstName lastName email role")
+      .populate("createdBy", "firstName lastName phone email")
+      .populate("assignedTo", "firstName lastName phone email")
+      .populate("updates.updatedBy", "firstName lastName phone email role")
 
     if (!task) {
       return new Response(
@@ -162,9 +162,9 @@ export async function PATCH(request, { params }) {
 
     // Update the task
     const updatedTask = await Task.findOneAndUpdate(query, { $set: body }, { new: true, runValidators: true })
-      .populate("createdBy", "firstName lastName email")
-      .populate("assignedTo", "firstName lastName email")
-      .populate("updates.updatedBy", "firstName lastName email role")
+      .populate("createdBy", "firstName lastName phone email")
+      .populate("assignedTo", "firstName lastName phone email")
+      .populate("updates.updatedBy", "firstName lastName phone email role")
 
     return new Response(
       JSON.stringify({ success: true, data: updatedTask }),
