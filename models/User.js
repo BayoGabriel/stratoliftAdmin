@@ -59,6 +59,26 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
+  },
+  installed: {
+    type: Date,
+    default: Date.now,
+  },
+  inspection: {
+    type: Date,
+    default: () => {
+      const date = new Date();
+      date.setMonth(date.getMonth() + 6);
+      return date;
+    }
+  },
+  load: {
+    type: String,
+    default: "480Kg",
+  },
+  floors: {
+    type: Number,
+    default: 4,
   }
 })
 
